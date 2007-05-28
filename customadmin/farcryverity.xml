@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<webtop>
+	<section mergeType="merge" id="admin">
+		<subsection mergeType="merge" id="farcryveritysubSection" label="Verity Plugin" labelType="value">
+			<menu mergeType="merge" id="farcryveritymenu" label="Verity Management" labelType="value">
+				<menuitem mergeType="merge" id="farcryveritymenuitem01" label="Config Test" link="/admin/customadmin.cfm?module=customlists/configuration.cfm&amp;plugin=farcryverity" />
+				<menuitem mergeType="merge" id="farcryveritymenuitem02" label="Collections" link="/admin/customadmin.cfm?module=customlists/farVerityCollection.cfm&amp;plugin=farcryverity" />
+			</menu>
+			<menu mergeType="merge" id="farcryveritymenu2" label="Verity Debug" labelType="value">
+				<menuitem mergeType="merge" id="farcryverityservicetest" label="Service Test" link="/admin/customadmin.cfm?module=customlists/servicetest.cfm&amp;plugin=farcryverity" />
+			</menu>
+		</subsection>
+	</section>
+</webtop>
