@@ -33,6 +33,8 @@
 	<cffunction name="setCollectionArray" access="public" output="false" returntype="void">
 		<cfset var qCollections=getCollections() />
 		<cfset var st=structNew() />
+		<cfset variables.aCollections = arrayNew(1) />
+		
 		<cfloop query="qCollections">
 			<cfset st=structNew() />
 			<cfset st.configid=qCollections.configid />
