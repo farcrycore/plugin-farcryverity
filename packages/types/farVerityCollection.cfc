@@ -259,4 +259,15 @@ library methods
 	<cfreturn qlistdata />
 </cffunction>
 
+
+
+	<cffunction name="AfterSave" access="public" output="false" returntype="struct" hint="Called from setData and createData and run after the object has been saved.">
+		<cfargument name="stProperties" required="yes" type="struct" hint="A structure containing the contents of the properties that were saved to the object.">
+
+		<cfset application.stplugins.farcryverity.oVerityConfig.setCollectionArray()>
+		<cfset application.stplugins.farcryverity.oVerityConfig.setCollectionList()>
+		
+		<cfreturn arguments.stProperties />
+	</cffunction>
+
 </cfcomponent>
