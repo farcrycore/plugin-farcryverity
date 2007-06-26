@@ -5,10 +5,10 @@
 	<cfproperty name="lCollections" displayname="Collections" hint="List of active collections." type="string" />
 
 	<!--- pseudo constructor --->
-	<cfset storagePath="" />
-	<cfset aCollections=arrayNew(1) />
-	<cfset lCollections="" />
-	<cfset hostname=createObject("java", "java.net.InetAddress").localhost.getHostName() />
+	<cfset variables.storagePath="" />
+	<cfset variables.aCollections=arrayNew(1) />
+	<cfset variables.lCollections="" />
+	<cfset variables.hostname=createObject("java", "java.net.InetAddress").localhost.getHostName() />
 
 	<cffunction name="init" access="public" output="false" returntype="verityConfig">
 		<cfset setCollectionArray() />
@@ -17,17 +17,17 @@
 	</cffunction>
 
 	<cffunction name="getStoragePath" access="public" output="false" returntype="string">
-		<cfreturn storagePath />
+		<cfreturn variables.storagePath />
 	</cffunction>
 
 	<cffunction name="setStoragePath" access="public" output="false" returntype="void">
 		<cfargument name="storagePath" type="string" required="true" />
-		<cfset storagePath = arguments.storagePath />
+		<cfset variables.storagePath = arguments.storagePath />
 		<cfreturn />
 	</cffunction>
 
 	<cffunction name="getCollectionArray" access="public" output="false" returntype="array">
-		<cfreturn aCollections />
+		<cfreturn variables.aCollections />
 	</cffunction>
 
 	<cffunction name="setCollectionArray" access="public" output="false" returntype="void">
@@ -40,18 +40,18 @@
 			<cfset st.configid=qCollections.configid />
 			<cfset st.title=qCollections.title />
 			<cfset st.collectionname=qCollections.collectionname />
-			<cfset arrayAppend(aCollections, st) />
+			<cfset arrayAppend(variables.aCollections, st) />
 		</cfloop>
 		<cfreturn />
 	</cffunction>
 
 	<cffunction name="getCollectionList" access="public" output="false" returntype="string">
-		<cfreturn lCollections />
+		<cfreturn variables.lCollections />
 	</cffunction>
 
 	<cffunction name="setCollectionList" access="public" output="false" returntype="void">
 		<cfset var qCollections=getCollections() />
-		<cfset lCollections = valuelist(qCollections.collectionname) />
+		<cfset variables.lCollections = valuelist(qCollections.collectionname) />
 		<cfreturn />
 	</cffunction>
 
