@@ -58,10 +58,12 @@ $Developer: Geoff Bowers (modius@daemon.com.au) $
 	
 	<!--- required config values --->
 	<cfif NOT structkeyexists(arguments.config, "lindexproperties") OR NOT len(arguments.config.lindexproperties)>
-		<cfthrow message="update: lindexproperties not present in config." />
+		<!--- <cfthrow message="update: lindexproperties not present in config." /> --->
+		<cfset arguments.config.lindexproperties="label" />
 	</cfif>
 	<cfif NOT structkeyexists(arguments.config, "indexTitle") OR NOT len(arguments.config.indexTitle)>
-		<cfthrow message="update: indexTitle not present in config." />
+		<!--- <cfthrow message="update: indexTitle not present in config." /> --->
+		<cfset arguments.config.indexTitle="label" />
 	</cfif>
 	<cfif NOT structkeyexists(arguments.config, "builttodate") OR NOT isDate(arguments.config.builttodate)>
 		<cfthrow message="update: valid builttodate not present in config." />
@@ -191,7 +193,32 @@ $Developer: Geoff Bowers (modius@daemon.com.au) $
 	<cfthrow message="refresh: not quite baked yet." />
 </cffunction>
 
+<!----------------------------------------------- 
+Gateway
+------------------------------------------------>
+<cffunction name="getCollections" access="public" output="false" returntype="query" hint="Return application collections.">
+	<cfargument name="bActive" default="true" type="boolean" hint="Restrict to active collections only." />
+	
+	
+	
+	<cfthrow message="refresh: not quite baked yet." />
+</cffunction>
 
+<cffunction name="getCollectionQuery" access="private" returntype="query" output="false" hint="Get all the collections registered for this coldfusion instance, filtered for the application name.">
+	<cfset var qReturn=queryNew("CATEGORIES, CHARSET, CREATED, DOCCOUNT, EXTERNAL, LANGUAGE, LASTMODIFIED, MAPPED, NAME, ONLINE, PATH, REGISTERED, SIZE") />
+	
+	<cfcollection action="list" name="qReturn" />
+	
+	<!--- filter for the active application name --->
+	<cfquery dbtype="query" name="qReturn">
+	SELECT CATEGORIES, CHARSET, CREATED, DOCCOUNT, EXTERNAL, LANGUAGE, LASTMODIFIED, MAPPED, NAME, ONLINE, PATH, REGISTERED, SIZE
+	FROM qReturn
+	WHERE NAME LIKE '#application.ApplicationName#%'
+	</cfquery>
+	
+	<cfreturn qReturn />
+	
+</cffunction>
 
 <!----------------------------------------------- 
 Collection Maintenance

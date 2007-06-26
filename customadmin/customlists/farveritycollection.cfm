@@ -22,7 +22,7 @@ ENVIRONMENT
 <!----------------------------------------
 ACTION
 ----------------------------------------->
-<!--- <cfdump var="#form#"> --->
+<cfdump var="#form#">
 
 <ft:processForm action="create" >
 	<!--- redirect to invoker --->
@@ -33,11 +33,11 @@ ACTION
 </ft:processForm>
 
 <ft:processForm action="delete" >
-	<!--- redirect to invoker --->
-	<cfset oVerity=createobject("component", "farcry.plugins.farcryverity.packages.custom.verityservice").init() />
-	<cfset stConfig=createobject("component", "farcry.plugins.farcryverity.packages.types.farveritycollection").getData(objectid=form.selectedobjectid) />
-	<cfset stresult=oVerity.deleteCollection(collection=stconfig.collectionname) />
-	<cfdump var="#stResult.message#" />
+	<cfset oConfig=createobject("component", "farcry.plugins.farcryverity.packages.types.farveritycollection") />
+	<cfloop list="#form.selectedobjectid#" index="id">
+		<cfset stresult=oConfig.delete(objectid=id) />
+		<cfdump var="#stResult.message#" />
+	</cfloop>
 </ft:processForm>
 
 <ft:processForm action="optimize" >
@@ -74,7 +74,7 @@ VIEW
 	typename="farVerityCollection"
 	permissionset="news"
 	title="Verity Collections"
-	columnList="title,collectiontypename,hostname,builttodate,lIndexProperties,benablesearch"
+	columnList="title,collectiontypename,hostname,builttodate,lIndexProperties,benablesearch,collectiontype"
 	aCustomColumns="#aCustomColumns#"
 	sortableColumns="title,collectiontypename,hostname,builttodate"
 	lFilterFields="title,hostname"

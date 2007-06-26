@@ -11,13 +11,14 @@ $
 || DEVELOPER ||
 $Developer: Geoff Bowers (modius@daemon.com.au) $
 --->
-<cfcomponent extends="farcry.core.packages.types.types" displayname="Verity Collection" hint="Configuration object for Verity free text search collection." bSchedule="false" bFriendly="false">
+<cfcomponent extends="farcry.core.packages.types.types" displayname="Verity Collection" hint="Configuration object for Verity free text search collection." bSchedule="false" bFriendly="false" bSystem="true">
 <!------------------------------------------------------------------------
 type properties
 ------------------------------------------------------------------------->	
 <cfproperty ftseq="1" ftfieldset="Collection Details" name="title" type="string" hint="Collection title." required="no" default="" ftlabel="Title" ftvalidation="required" />
-<cfproperty ftseq="2" ftfieldset="Collection Details" name="collectiontypename" type="string" hint="Collection content type." required="no" default="" fttype="list" ftrendertype="dropdown" ftlistdata="getContentTypes" ftlabel="Content Type" />
-<cfproperty ftseq="3" ftfieldset="Collection Details" name="collectionname" type="string" hint="Verity/ColdFusion collection name." required="no" default="" ftlabel="Collection Name" ftdisplayonly="true" />
+<cfproperty ftseq="2" ftfieldset="Collection Details" name="collectiontype" type="string" hint="Collection type." required="no" default="" fttype="list" ftrendertype="dropdown" ftlist="custom:Standard,file:File Library,cat:Category Filtered" ftlabel="Collection Type" />
+<cfproperty ftseq="3" ftfieldset="Collection Details" name="collectiontypename" type="string" hint="Collection content type." required="no" default="" fttype="list" ftrendertype="dropdown" ftlistdata="getContentTypes" ftlabel="Content Type" />
+<cfproperty ftseq="4" ftfieldset="Collection Details" name="collectionname" type="string" hint="Verity/ColdFusion collection name." required="no" default="" ftlabel="Collection Name" ftdisplayonly="true" />
 <cfproperty ftseq="5" ftfieldset="Collection Details" name="collectionpath" type="string" hint="Absolute path to the collection stem on the host." required="no" default="" ftlabel="Collection Path" ftdisplayonly="true" />
 <cfproperty ftseq="6" ftfieldset="Collection Details" name="hostname" type="string" hint="Host the collection physically resides on." required="no" default="" ftlabel="Hostname" ftdisplayonly="true" />
 
@@ -27,6 +28,7 @@ type properties
 <cfproperty ftseq="41" ftfieldset="Advanced Options" name="custom3" type="date" hint="Custom3 field hijack for a single date property; for example, publishdate." required="no" default="" fttype="list" ftlistdata="getIndexDates" ftlabel="Date Filter" />
 <cfproperty ftseq="42" ftfieldset="Advanced Options" name="custom4" type="string" hint="Custom4 field hijack for a single string/longchar property; for example, lauthors." required="no" default="" fttype="list" ftlistdata="getIndexMisc" ftlabel="Miscellaneous Filter" />
 <cfproperty ftseq="43" ftfieldset="Advanced Options" name="fileproperty" type="string" hint="Associated file collection will be based on this filepath property if activated." required="no" default="" fttype="list" ftlistdata="getIndexFilePaths" ftlabel="File Collection" />
+<cfproperty ftseq="44" ftfieldset="Advanced Options" name="catCollection" type="string" hint="Category filter for collection." required="no" default="" fttype="category" ftalias="root" ftlabel="Category Filter" />
 
 <cfproperty ftseq="61" ftfieldset="Operational" name="builttodate" type="date" hint="The date the collection was last built to.  Can be manually overridden to force collection to update from the specified point, based on typename datetimelastupdated." required="yes" default="1970-01-01" fttype="datetime" ftlabel="Built To date" />
 <cfproperty ftseq="62" ftfieldset="Operational" name="bEnableSearch" type="boolean" hint="Enable search; by default new collections start as disabled." required="no" default="" ftlabel="Enable Search?" />
@@ -52,7 +54,23 @@ update requirements
 beforeSave(); update hostname
 afterSave(); synch with other host collections
 ------------------------------------------------------------------------->
-
+<cffunction name="delete" access="public" hint="Delete associated collection and content item." returntype="struct" output="false">
+	<cfargument name="objectid" required="yes" type="UUID" hint="Object ID of the object being deleted">
+	<cfargument name="user" type="string" required="true" hint="Username for object creator" default="">
+	<cfargument name="auditNote" type="string" required="true" hint="Note for audit trail" default="">
+	
+	<cfset var stobj=getData(objectid=arguments.objectid) />
+	<cfset var stReturn=structNew() />
+	<cfset var oVerity=createobject("component", "farcry.plugins.farcryverity.packages.custom.verityservice").init() />
+	
+	<cfset stReturn=super.delete(objectid=stobj.objectid, auditNote="Deleted configuration and associated collection for #stobj.collectionname#.")>
+	
+	<cfif stReturn.bSuccess>
+		<cfset stReturn=oVerity.deleteCollection(collection=stobj.collectionname) />
+	</cfif>
+	
+	<cfreturn stReturn>
+</cffunction>
 
 
 	
