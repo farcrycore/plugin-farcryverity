@@ -5,6 +5,7 @@
 ENVIRONMENT
 ----------------------------------------->
 <cfscript>
+	// apply custom cell renderers
 	aCustomColumns = arrayNew(1);
 	sttmp = structNew();
 	sttmp.webskin = "cellCollectionUpdate.cfm"; // located in the webskin of the type the controller is listing on
@@ -22,17 +23,14 @@ ENVIRONMENT
 <!----------------------------------------
 ACTION
 ----------------------------------------->
-<cfdump var="#form#">
-
-<ft:processForm action="create" >
-	<!--- redirect to invoker --->
+<ft:processForm action="create">
 	<cfset oVerity=createobject("component", "farcry.plugins.farcryverity.packages.custom.verityservice").init() />
 	<cfset stConfig=createobject("component", "farcry.plugins.farcryverity.packages.types.farveritycollection").getData(objectid=form.selectedobjectid) />
 	<cfset stresult=oVerity.createCollection(collection=stconfig.collectionname) />
 	<cfdump var="#stResult.message#" />
 </ft:processForm>
 
-<ft:processForm action="delete" >
+<ft:processForm action="deleteCollection" >
 	<cfset oConfig=createobject("component", "farcry.plugins.farcryverity.packages.types.farveritycollection") />
 	<cfloop list="#form.selectedobjectid#" index="id">
 		<cfset stresult=oConfig.delete(objectid=id) />
@@ -41,7 +39,6 @@ ACTION
 </ft:processForm>
 
 <ft:processForm action="optimize" >
-	<!--- redirect to invoker --->
 	<cfset oVerity=createobject("component", "farcry.plugins.farcryverity.packages.custom.verityservice").init() />
 	<cfset stConfig=createobject("component", "farcry.plugins.farcryverity.packages.types.farveritycollection").getData(objectid=form.selectedobjectid) />
 	<cfset stresult=oVerity.optimizeCollection(collection=stconfig.collectionname) />
@@ -49,7 +46,6 @@ ACTION
 </ft:processForm>
 
 <ft:processForm action="update" >
-	<!--- redirect to invoker --->
 	<cfset oVerity=createobject("component", "farcry.plugins.farcryverity.packages.custom.verityservice").init() />
 	<cfset stConfig=createobject("component", "farcry.plugins.farcryverity.packages.types.farveritycollection").getData(objectid=form.selectedobjectid) />
 	<cfset stresult=oVerity.update(config=stconfig) />
@@ -57,7 +53,6 @@ ACTION
 </ft:processForm>
 
 <ft:processForm action="purge" >
-	<!--- redirect to invoker --->
 	<cfset oVerity=createobject("component", "farcry.plugins.farcryverity.packages.custom.verityservice").init() />
 	<cfset stConfig=createobject("component", "farcry.plugins.farcryverity.packages.types.farveritycollection").getData(objectid=form.selectedobjectid) />
 	<cfset stresult=oVerity.purge(collection=stconfig.collectionname) />
@@ -83,7 +78,7 @@ VIEW
 	module="customlists/farveritycollection.cfm"
 	bFlowCol="false"
 	bViewCol="false"
-	lCustomActions="duplicate:Duplicate,remove:Remove Me" />
+	<!--- lCustomActions="duplicate:Duplicate,remove:Remove Me" ---> />
 
 <!--- setup footer --->
 <admin:footer />

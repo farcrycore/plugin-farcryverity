@@ -53,6 +53,8 @@ $Developer: Geoff Bowers (modius@daemon.com.au) $
 	<cfset var lcolumns = "objectid,datetimelastupdated" />
 	<cfset var prop = "" />
 	<cfset var qUpdates=queryNew("blah") />
+	<cfset var qSentToDraft=queryNew("objectid") />
+	<cfset var qDeleted=queryNew("objectid") />
 	<cfset var stConfigProps=structNew() />
 	<cfset var oVerityCollection="" />
 	
@@ -90,7 +92,14 @@ $Developer: Geoff Bowers (modius@daemon.com.au) $
 			<cfset lcolumns = listAppend(lColumns, prop) />
 		</cfif>
 	</cfloop>
-	
+
+<!--- 	
+	todo: 
+	 - move to farVerityCollection so it can be overridden
+	 - add check to update method so update method can reside in content type
+	 - move verity actions to private methods
+--->
+	<!--- determine recently updated content items --->
 	<cfquery name="qUpdates" datasource="#application.dsn#" maxrows="#variables.chunksize#">
 	SELECT
 		<!--- define custom fields ---> 
@@ -108,18 +117,42 @@ $Developer: Geoff Bowers (modius@daemon.com.au) $
 	ORDER BY datetimelastupdated
 	</cfquery>
 	
+	<!--- determine content items recently sent to draft --->
+	<cfif structkeyexists(application.stcoapi[arguments.config.collectiontypename].stprops, "status")>
+		<cfquery name="qSentToDraft" datasource="#application.dsn#">
+		SELECT objectid
+		FROM #arguments.config.collectiontypename#
+		WHERE 
+			datetimelastupdated > #createodbcdatetime(arguments.config.builttodate)#
+			AND status IN ('draft', 'pending')
+		ORDER BY datetimelastupdated
+		</cfquery>
+	</cfif>	
+	
+	<!--- determine recently deleted content --->
+	<cfquery name="qDeleted" datasource="#application.dsn#">
+	SELECT objectid
+	FROM fqAudit
+	WHERE 
+		datetimeStamp > #createodbcdatetime(arguments.config.builttodate)#
+		AND auditType = 'delete'
+	ORDER BY datetimeStamp
+	</cfquery>
+
+	
 	<!--- if no results, return immediately --->
-	<cfif NOT qUpdates.recordcount>
+	<cfif NOT qUpdates.recordcount AND NOT qSentToDraft.recordcount AND NOT qDeleted.recordcount>
 		<cfset stResult.bsuccess="true" />
 		<cfset stResult.message= arguments.config.collectionname & " had no records to update." />
-		<!--- debug only --->
+		<!--- todo: remove, debug only --->
 		<cfset stresult.arguments = arguments />
 		<cfset stresult.qUpdates = qUpdates />
-	
+		<cfset stresult.qUpdates = qSentToDraft />
+		<cfset stresult.qUpdates = qDeleted />
 		<cfreturn stresult />
 	</cfif>
 	
-	<!--- update verity collection --->
+	<!--- update new content items --->
 	<cftry>
 		<cfset stResult.bsuccess="true" />
 		<cfset stResult.message= arguments.config.collectionname & ";  " & qUpdates.recordcount & " record(s) updated." />
@@ -140,6 +173,32 @@ $Developer: Geoff Bowers (modius@daemon.com.au) $
 		<cfcatch>
 			<cfset stResult.bsuccess="false" />
 			<cfset stResult.message=cfcatch.Message />
+		</cfcatch>
+	</cftry>
+
+	<!--- remove content sent to draft --->
+	<cftry>
+		<cfset stResult.bsuccess="true" />
+		<cfset stResult.message=stResult.message & " " & arguments.config.collectionname & ";  " & qSentToDraft.recordcount & " record(s) removed." />
+		
+		<cfindex action="delete" type="custom" query="qSentToDraft" collection ="#arguments.config.collectionname#" key="objectid" />
+		
+		<cfcatch>
+			<cfset stResult.bsuccess="false" />
+			<cfset stResult.message=stResult.message & " " & cfcatch.Message />
+		</cfcatch>
+	</cftry>
+	
+	<!--- remove content deleted --->
+	<cftry>
+		<cfset stResult.bsuccess="true" />
+		<cfset stResult.message=stResult.message & " " & arguments.config.collectionname & ";  " & qDeleted.recordcount & " record(s) deleted." />
+		
+		<cfindex action="delete" type="custom" query="qDeleted" collection ="#arguments.config.collectionname#" key="objectid" />
+		
+		<cfcatch>
+			<cfset stResult.bsuccess="false" />
+			<cfset stResult.message=stResult.message & " " & cfcatch.Message />
 		</cfcatch>
 	</cftry>
 	
