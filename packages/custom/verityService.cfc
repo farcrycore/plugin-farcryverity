@@ -98,6 +98,7 @@ $Developer: Geoff Bowers (modius@daemon.com.au) $
 	 - move to farVerityCollection so it can be overridden
 	 - add check to update method so update method can reside in content type
 	 - move verity actions to private methods
+	 - add dbowner requirements
 --->
 	<!--- determine recently updated content items --->
 	<cfquery name="qUpdates" datasource="#application.dsn#" maxrows="#variables.chunksize#">
