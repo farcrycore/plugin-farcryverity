@@ -85,7 +85,9 @@ $Developer: Geoff Bowers (modius@daemon.com.au) $
 		<cfset lcolumns = listAppend(lColumns, arguments.config.custom3) />
 	</cfif>
 	<cfif structkeyexists(arguments.config, "custom4") AND len(arguments.config.custom4)>
-		<cfset lcolumns = listAppend(lColumns, arguments.config.custom4) />
+		<cfif NOT listFindNoCase(lColumns, arguments.config.custom4)>
+			<cfset lcolumns = listAppend(lColumns, arguments.config.custom4) />
+		</cfif>
 	</cfif>
 	<cfloop list="#arguments.config.lindexproperties#" index="prop">
 		<cfif NOT listFindNoCase(lColumns, prop)>
