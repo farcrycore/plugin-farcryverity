@@ -58,6 +58,7 @@ afterSave(); synch with other host collections
 	<cfargument name="objectid" required="yes" type="UUID" hint="Object ID of the object being deleted">
 	<cfargument name="user" type="string" required="true" hint="Username for object creator" default="">
 	<cfargument name="auditNote" type="string" required="true" hint="Note for audit trail" default="">
+	<cfargument name="bDeleteCollection" type="boolean" required="false" default="true" />
 	
 	<cfset var stobj=getData(objectid=arguments.objectid) />
 	<cfset var stReturn=structNew() />
@@ -65,9 +66,11 @@ afterSave(); synch with other host collections
 	
 	<cfset stReturn=super.delete(objectid=stobj.objectid, auditNote="Deleted configuration and associated collection for #stobj.collectionname#.")>
 	
-	<cfif stReturn.bSuccess>
+	<cfif stReturn.bSuccess AND arguments.bDeleteCollection>
 		<cfset stReturn=oVerity.deleteCollection(collection=stobj.collectionname) />
 	</cfif>
+	
+	<cfset resetActiveCollections() />
 	
 	<cfreturn stReturn>
 </cffunction>

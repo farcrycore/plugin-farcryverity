@@ -20,7 +20,21 @@ ACTION
 <cfswitch expression="#form.action#">
 
 	<cfcase value="Purge Redundant Configs">
-		<cfoutput><h3>Not quite baked: Purge Redundant Configs</h3></cfoutput>
+		<cfoutput><h3>Purge Redundant Configs</h3></cfoutput>
+				
+		<cfset ofvc=createObject("component", "farcry.plugins.farcryverity.packages.types.farVerityCollection") />
+
+		<cfloop query="qPurge">
+			<cfif qPurge.hostname eq application.sysinfo.machinename>
+				<cfset stResult=ofvc.delete(objectid=qPurge.objectid, bDeleteCollection="true") />
+			<cfelse>
+				<cfset stResult=ofvc.delete(objectid=qPurge.objectid, bDeleteCollection="false") />
+			</cfif>
+			
+			<cfdump var="#stResult#" label="#qPurge.title#, #qPurge.hostname#" />
+		</cfloop>
+		<cfoutput>All Done.</cfoutput>
+		<cfabort />
 	</cfcase>
 
 </cfswitch>
