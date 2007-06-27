@@ -43,7 +43,7 @@ ACTION:
 	<ft:processformobjects typename="#URL.Typename#" />
 	
 	<!--- synchronise the settings for other members of lhosts --->
-	<cfif listlen(application.stplugins.farcryverity.lhosts)>
+	<cfif len(application.stplugins.farcryverity.lhosts)>
 		<cfquery datasource="#application.dsn#" name="qConfigs">
 		SELECT objectid FROM farVerityCollection
 		WHERE 
@@ -52,10 +52,8 @@ ACTION:
 		</cfquery>
 		
 		<cfloop query="qConfigs">
-			<!--- get original host config --->
 			<cfset stConfig=getData(objectid=qConfigs.objectid) />
-			<!--- re-grab stobj as stobj is not reset after update --->
-			<cfset stobj=getData(objectid=stobj.objectid) />
+			<cfset stObj=getData(objectid=stobj.objectid) />
 			<cfset stUpdate=duplicate(stobj) />
 			<!--- reset immutable properties --->
 			<cfset stUpdate.objectid=stConfig.objectid />
