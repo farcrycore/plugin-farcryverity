@@ -6,7 +6,7 @@
 ACTION:
 -------------------------------->
 <ft:processform action="Create Collection" url="refresh">
-	<!--- primary content item --->
+	<!--- create physical collection --->
 	<ft:processformobjects typename="#URL.Typename#" r_stproperties="stprops">
 		<cfset stprops.hostname=application.sysinfo.machinename />
 		<cfset stprops.collectionname=application.applicationname & "_" & stprops.collectiontypename />
@@ -39,8 +39,30 @@ ACTION:
 </ft:processform>
 
 <ft:processform action="Save">
-	<!--- primary content item --->
+	<!--- update primary content item --->
 	<ft:processformobjects typename="#URL.Typename#" />
+	
+	<!--- synchronise the settings for other members of lhosts --->
+	<cfif len(application.stplugins.farcryverity.lhosts)>
+		<cfquery datasource="#application.dsn#" name="qConfigs">
+		SELECT objectid FROM farVerityCollection
+		WHERE 
+			collectionname = '#stobj.collectionname#'
+			AND objectid <> '#stobj.objectid#'
+		</cfquery>
+		
+		<cfloop query="qConfigs">
+			<cfset stConfig=getData(objectid=qConfigs.objectid) />
+			<cfset stUpdate=stobj />
+			<!--- reset immutable properties --->
+			<cfset stUpdate.hostname=stConfig.hostname />
+			<cfset stUpdate.collectionpath=stConfig.collectionpath />
+			<!--- <cfset stUpdate.builttodate=stConfig.builttodate /> --->
+			<cfset setData(objectid=qConfigs.objectid, stproperties=stUpdate) />
+		</cfloop>
+	</cfif>
+	
+	<cfset resetActiveCollections() />
 </ft:processform>
 
 <ft:processform action="Save,Cancel" Exit="true" />

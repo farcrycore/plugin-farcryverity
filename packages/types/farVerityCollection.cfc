@@ -72,7 +72,13 @@ afterSave(); synch with other host collections
 	<cfreturn stReturn>
 </cffunction>
 
-
+<cffunction name="resetActiveCollections" access="public" output="false" returntype="void" hint="Reset the active collection list for this host.">
+	<!--- reset active collections --->
+	<!--- todo: need to alert other members of lhosts to reset collections --->
+	<cfset application.stplugins.farcryverity.oVerityConfig.setCollectionArray()>
+	<cfset application.stplugins.farcryverity.oVerityConfig.setCollectionList()>
+	<cfreturn />
+</cffunction>
 	
 <!------------------------------------------------------------------------
 formtool methods
@@ -261,13 +267,6 @@ library methods
 
 
 
-	<cffunction name="AfterSave" access="public" output="false" returntype="struct" hint="Called from setData and createData and run after the object has been saved.">
-		<cfargument name="stProperties" required="yes" type="struct" hint="A structure containing the contents of the properties that were saved to the object.">
 
-		<cfset application.stplugins.farcryverity.oVerityConfig.setCollectionArray()>
-		<cfset application.stplugins.farcryverity.oVerityConfig.setCollectionList()>
-		
-		<cfreturn arguments.stProperties />
-	</cffunction>
 
 </cfcomponent>
