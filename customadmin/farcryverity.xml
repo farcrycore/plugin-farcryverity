@@ -3,15 +3,22 @@
 	<section mergeType="merge" id="admin">
 		<subsection mergeType="merge" id="farcryveritysubSection" label="Verity Plugin" labelType="value">
 
-			<menu mergeType="merge" id="farcryveritymenu" label="Verity Management" labelType="value">
-				<menuitem mergeType="merge" id="farcryveritymenuitem02" label="Collections" link="/admin/customadmin.cfm?module=customlists/farveritycollection.cfm&amp;plugin=farcryverity" />
-				<menuitem mergeType="merge" id="farcryveritymenuitem03" label="Host Management" link="/admin/customadmin.cfm?module=customlists/hostmanagement.cfm&amp;plugin=farcryverity" />
+			<menu mergeType="merge" id="farcryveritymenu" label="Search Settings" labelType="value">
+				<menuitem mergeType="merge" id="farcryveritymenuitem02" label="Local Collections" link="/admin/customadmin.cfm?module=customlists/farveritycollection.cfm&amp;plugin=farcryverity" />
+				<menuitem mergeType="merge" id="farcryveritymenuitem03" label="All Collections" link="/admin/customadmin.cfm?module=customlists/farveritycollectionall.cfm&amp;plugin=farcryverity" />
+				
 			</menu>
 
-			<menu mergeType="merge" id="farcryveritymenu2" label="Verity Debug" labelType="value">
-				<menuitem mergeType="merge" id="farcryveritymenuitem21" label="Config Test" link="/admin/customadmin.cfm?module=customlists/configuration.cfm&amp;plugin=farcryverity" />				
-				<menuitem mergeType="merge" id="farcryveritymenuitem22" label="Service Test" link="/admin/customadmin.cfm?module=customlists/servicetest.cfm&amp;plugin=farcryverity" />
-				<menuitem mergeType="merge" id="farcryveritymenuitem23" label="All Collections" link="/admin/customadmin.cfm?module=customlists/farveritycollectionall.cfm&amp;plugin=farcryverity" />
+			<menu mergeType="merge" id="farcryveritymenu2" label="Search Utilities" labelType="value">
+				<menuitem mergeType="merge" id="farcryveritymenuitem20" label="Host Synchronisation" link="/admin/customadmin.cfm?module=customlists/hostmanagement.cfm&amp;plugin=farcryverity" />
+				<menuitem mergeType="merge" id="farcryveritymenuitem21" label="Create Missing Collections" link="/admin/customadmin.cfm?module=customlists/createmissing.cfm&amp;plugin=farcryverity" />				
+				<menuitem mergeType="merge" id="farcryveritymenuitem22" label="Purge Redundant Configs" link="/admin/customadmin.cfm?module=customlists/purgeconfigs.cfm&amp;plugin=farcryverity" />
+				
+			</menu>
+
+			<menu mergeType="merge" id="farcryveritymenu3" label="Verity Debug" labelType="value">
+				<menuitem mergeType="merge" id="farcryveritymenuitem31" label="Config Test" link="/admin/customadmin.cfm?module=customlists/configuration.cfm&amp;plugin=farcryverity" />				
+				<menuitem mergeType="merge" id="farcryveritymenuitem32" label="Service Test" link="/admin/customadmin.cfm?module=customlists/servicetest.cfm&amp;plugin=farcryverity" />
 			</menu>
 
 		</subsection>
