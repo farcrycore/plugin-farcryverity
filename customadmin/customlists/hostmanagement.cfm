@@ -97,104 +97,57 @@ ACTION
 		</cfloop>
 		
 	</cfcase>
-
-	<cfcase value="Purge Redundant Configs">
-		<cfoutput><h3>Not quite baked: Purge Redundant Configs</h3></cfoutput>
-	</cfcase>
-
-	<cfcase value="Create Verity Collections">
-		<cfoutput><h3>Not quite baked: Create Verity Collections</h3></cfoutput>
-	</cfcase>
 	
 </cfswitch>
 
 <!----------------------------------------
 VIEW
 ----------------------------------------->
-<!--- only show admin if more than one registered host; else help text --->
-<cfif listlen(application.stplugins.farcryverity.lhosts) gt 1>
-
 <!--- set up page header --->
 <admin:header title="Host Management" />
 
-<cfform format="flash" name="createhostcollections" height="150">
-	<cfformgroup type="panel" label="Create Missing Collections">
-		<!--- nested tree model orphans --->
-		<cfformitem type="html"><p>Create missing collections for this host.</p></cfformitem>
+<!--- Synchronise Host Configs --->
+<!--- only show admin if more than one registered host; else help text --->
+<cfif listlen(application.stplugins.farcryverity.lhosts) gt 1>
 
-		<cfformgroup type="horizontal">
-			<cfselect name="host" size="1">
-				<cfoutput><option value="#application.sysinfo.machineName#" selected>#application.sysinfo.machineName#</option></cfoutput>
-			</cfselect>
-			<cfinput type="submit" name="action" value="Create Verity Collections" />
+	<cfform format="flash" name="synchostform" height="150">
+		<cfformgroup type="panel" label="Synchronise Hosts">
+			<!--- nested tree model orphans --->
+			<cfformitem type="html"><p>Select a host from the list.  All other hosts will have their collection configuration changed 
+	to match the selected host. <b>There is no undo.</b></p></cfformitem>
+	
+			<cfformgroup type="horizontal">
+				<cfselect name="host" size="1">
+					<cfloop list="#application.stplugins.farcryverity.lhosts#" index="i">
+						<cfif application.sysinfo.machineName eq i>
+							<cfoutput><option value="#i#" selected>#i#</option></cfoutput>
+						<cfelse>
+							<cfoutput><option value="#i#">#i#</option></cfoutput>
+						</cfif>
+					</cfloop>
+				</cfselect>
+				<cfinput type="submit" name="action" value="Synchronise Collection Configs" />
+			</cfformgroup>
 		</cfformgroup>
-	</cfformgroup>
-</cfform>
-
-<cfform format="flash" name="synchostform" height="150">
-	<cfformgroup type="panel" label="Synchronise Hosts">
-		<!--- nested tree model orphans --->
-		<cfformitem type="html"><p>Select a host from the list.  All other hosts will have their collection configuration changed 
-to match the selected host. <b>There is no undo.</b></p></cfformitem>
-
-		<cfformgroup type="horizontal">
-			<cfselect name="host" size="1">
-				<cfloop list="#application.stplugins.farcryverity.lhosts#" index="i">
-					<cfif application.sysinfo.machineName eq i>
-						<cfoutput><option value="#i#" selected>#i#</option></cfoutput>
-					<cfelse>
-						<cfoutput><option value="#i#">#i#</option></cfoutput>
-					</cfif>
-				</cfloop>
-			</cfselect>
-			<cfinput type="submit" name="action" value="Synchronise Collection Configs" />
-		</cfformgroup>
-	</cfformgroup>
-</cfform>
-
-<cfform format="flash" name="purgehostform" height="150">
-	<cfformgroup type="panel" label="Purge Redundant Collections">
-		<!--- nested tree model orphans --->
-		<cfformitem type="html"><p>The listed hosts are not registered as authorised Verity hosts. Purge 
-			configs for the selected hosts, assuming the host is redundant. <b>There is no undo.</b></p></cfformitem>
-
-		<cfformgroup type="horizontal">
-			<cfselect name="host" size="1">
-				<cfloop list="#application.stplugins.farcryverity.lhosts#" index="i">
-					<cfif application.sysinfo.machineName eq i>
-						<cfoutput><option value="#i#" selected>#i#</option></cfoutput>
-					<cfelse>
-						<cfoutput><option value="#i#">#i#</option></cfoutput>
-					</cfif>
-				</cfloop>
-			</cfselect>
-			<cfinput type="submit" name="action" value="Purge Redundant Configs" />
-		</cfformgroup>
-	</cfformgroup>
-</cfform>
-
-<!--- setup footer --->
-<admin:footer />
-
+	</cfform>
 
 <!--- help text if only one registered host --->
 <cfelse>
 
-	<!--- set up page header --->
-	<admin:header title="Host Management" />
-		<cfoutput>
-		<h2>Host Management Not Applicable</h2>
-		
-		<p>There is only one registered host for Verity management: <strong>#application.stplugins.farcryverity.lhosts#</strong></p>
-		
-		<p>If you need to register additional hosts to be managed by this application you will 
-			need to add the following list variable to ./projects/projectname/config/_serverSpecificVarsAfterInit.cfm</p>
-			<ul>
-				<li>&lt;cfset application.stplugins.farcryverity.lhosts="hostname1,hostname2,hostname3" /&gt;</li>
-			</ul>
-		<p>Where "hostname" is the actual machine name of the relevant server.</p>
-		</cfoutput>
+	<cfoutput>
+	<h2>Host Management Not Applicable</h2>
 	
-	<!--- setup footer --->
-	<admin:footer />
+	<p>There is only one registered host for Verity management: <strong>#application.stplugins.farcryverity.lhosts#</strong></p>
+	
+	<p>If you need to register additional hosts to be managed by this application you will 
+		need to add the following list variable to ./projects/projectname/config/_serverSpecificVarsAfterInit.cfm</p>
+		<ul>
+			<li>&lt;cfset application.stplugins.farcryverity.lhosts="hostname1,hostname2,hostname3" /&gt;</li>
+		</ul>
+	<p>Where "hostname" is the actual machine name of the relevant server.</p>
+	</cfoutput>
+
 </cfif>
+
+<!--- setup footer --->
+<admin:footer />

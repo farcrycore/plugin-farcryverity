@@ -262,19 +262,20 @@ Gateway
 <cffunction name="getCollections" access="public" output="false" returntype="query" hint="Return application collections.">
 	<cfargument name="bActive" default="true" type="boolean" hint="Restrict to active collections only." />
 	
+	<!--- todo: add params to filter return --->
+	<cfreturn getCollectionQuery() />
 	
 	
-	<cfthrow message="refresh: not quite baked yet." />
 </cffunction>
 
 <cffunction name="getCollectionQuery" access="private" returntype="query" output="false" hint="Get all the collections registered for this coldfusion instance, filtered for the application name.">
-	<cfset var qReturn=queryNew("CATEGORIES, CHARSET, CREATED, DOCCOUNT, EXTERNAL, LANGUAGE, LASTMODIFIED, MAPPED, NAME, ONLINE, PATH, REGISTERED, SIZE") />
+	<cfset var qReturn=queryNew("CATEGORIES, CHARSET, CREATED, DOCCOUNT, LASTMODIFIED, MAPPED, NAME, ONLINE, PATH, REGISTERED, SIZE") />
 	
 	<cfcollection action="list" name="qReturn" />
 	
 	<!--- filter for the active application name --->
 	<cfquery dbtype="query" name="qReturn">
-	SELECT CATEGORIES, CHARSET, CREATED, DOCCOUNT, EXTERNAL, LANGUAGE, LASTMODIFIED, MAPPED, NAME, ONLINE, PATH, REGISTERED, SIZE
+	SELECT CATEGORIES, CHARSET, CREATED, DOCCOUNT, LASTMODIFIED, MAPPED, NAME, ONLINE, PATH, REGISTERED, SIZE
 	FROM qReturn
 	WHERE NAME LIKE '#application.ApplicationName#%'
 	</cfquery>
