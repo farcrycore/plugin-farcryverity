@@ -8,7 +8,7 @@ ACTION:
 <ft:processform action="Create Collection" url="refresh">
 	<!--- create physical collection --->
 	<ft:processformobjects typename="#URL.Typename#" r_stproperties="stprops">
-		<cfset stprops.hostname=application.sysinfo.machinename />
+		<cfset stprops.hostname=lcase(application.sysinfo.machinename) />
 		<cfset stprops.collectionname=application.applicationname & "_" & stprops.collectiontypename />
 		<cfif stprops.collectiontype neq 'custom'>
 			<cfset stprops.collectionname=stprops.collectionname & "_" & stprops.collectiontype />
@@ -43,7 +43,7 @@ ACTION:
 	<ft:processformobjects typename="#URL.Typename#" />
 	
 	<!--- synchronise the settings for other members of lhosts --->
-	<cfif len(application.stplugins.farcryverity.lhosts)>
+	<cfif listlen(application.stplugins.farcryverity.lhosts)>
 		<cfquery datasource="#application.dsn#" name="qConfigs">
 		SELECT objectid FROM farVerityCollection
 		WHERE 
@@ -52,9 +52,13 @@ ACTION:
 		</cfquery>
 		
 		<cfloop query="qConfigs">
+			<!--- get original host config --->
 			<cfset stConfig=getData(objectid=qConfigs.objectid) />
-			<cfset stUpdate=stobj />
+			<!--- re-grab stobj as stobj is not reset after update --->
+			<cfset stobj=getData(objectid=stobj.objectid) />
+			<cfset stUpdate=duplicate(stobj) />
 			<!--- reset immutable properties --->
+			<cfset stUpdate.objectid=stConfig.objectid />
 			<cfset stUpdate.hostname=stConfig.hostname />
 			<cfset stUpdate.collectionpath=stConfig.collectionpath />
 			<!--- <cfset stUpdate.builttodate=stConfig.builttodate /> --->
