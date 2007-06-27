@@ -23,7 +23,7 @@ ACTION
 		<cfquery dbtype="query" name="qHostConfigs">
 		SELECT objectid
 		FROM qAllConfigs
-		WHERE lower(hostname) = '#form.host#'
+		WHERE lower(hostname) = '#lcase(form.host)#'
 		</cfquery>
 		
 		<!--- <cfdump var="#qHostConfigs#" label="qHostConfigs" /> --->
@@ -41,8 +41,8 @@ ACTION
 			<cfquery dbtype="query" name="qUpdateConfigs">
 			SELECT objectid
 			FROM qAllConfigs
-			WHERE lower(collectionname) = '#stconfig.collectionname#'
-			AND lower(hostname) <> '#stconfig.hostname#'
+			WHERE lower(collectionname) = '#lcase(stconfig.collectionname)#'
+			AND lower(hostname) <> '#lcase(stconfig.hostname)#'
 			</cfquery>
 			
 			<!--- <cfdump var="#qUpdateConfigs#" label="qUpdateConfigs: configs to be updated" /> --->
@@ -71,9 +71,9 @@ ACTION
 					<cfquery dbtype="query" name="qCreateConfig">
 					SELECT objectid
 					FROM qAllConfigs
-					WHERE lower(collectionname) = '#stconfig.collectionname#'
-					AND lower(hostname) <> '#form.host#'
-					AND lower(hostname) = '#j#'
+					WHERE lower(collectionname) = '#lcase(stconfig.collectionname)#'
+					AND lower(hostname) <> '#lcase(form.host)#'
+					AND lower(hostname) = '#lcase(j)#'
 					</cfquery>
 					
 					<!--- <cfdump var="#qCreateConfig#" label="qCreateConfig: #j#" /> --->
@@ -83,6 +83,7 @@ ACTION
 						<cfset stUpdate=duplicate(stConfig) />
 						<!--- set immutable properties --->
 						<cfset stUpdate.objectid=createUUID() />
+						<cfset stUpdate.builttodate=createODBCDateTime("1970-01-01") />
 						<cfset stUpdate.hostname=j />
 						<cfset stUpdate.collectionpath="" />
 						<cfset stUpdate.datetimecreated=now() />
