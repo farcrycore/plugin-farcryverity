@@ -19,13 +19,16 @@ $Developer: Geoff Bowers (modius@daemon.com.au) $
 	
 	<cfset variables.chunksize = arguments.chunksize />
 	
-	<!--- determine collection storage path --->
+	<!--- server specific collection path set in plugin constant scope --->
 	<cfif NOT len(arguments.path)>
-		<cfif structkeyexists(application.stplugins.farcryverity, "verityStoragePath")>
-		<!--- server specific collection path set in plugin constant scope --->
-			<cfset variables.path = application.stplugins.farcryverity.verityStoragePath />
-
-		<cfelseif structkeyexists(application.path, "verityStoragePath")>
+		<cfset variables.path = application.stplugins.farcryverity.oVerityConfig.getStoragePath() />
+	<cfelse>
+		<cfset variables.path = arguments.path />
+	</cfif>	
+	
+	<!--- backward compatability; collection storage path --->
+	<cfif NOT len(variables.path)>
+		<cfif structkeyexists(application.path, "verityStoragePath")>
 		<!--- deprecated; server specific collection path set in ./config/_serverSpecificVars.cfm --->
 			<cfset variables.path = application.path.verityStoragePath />
 		
@@ -33,13 +36,11 @@ $Developer: Geoff Bowers (modius@daemon.com.au) $
 		<!--- deprecated; collection set in general config --->
 			<cfset variables.path = application.config.general.verityStoragePath />
 		</cfif>
-		
-		<cfif NOT len(variables.path)>
-		<!--- can't determine a proper path --->
-			<cfthrow type="Application" errorcode="plugins.farcryverity.verityservice" message="Collection path not defined." detail="A collection path for verity collections must be defined to use the Verity plugin." />
-		</cfif>
-	<cfelse>
-		<cfset variables.path = arguments.path />
+	</cfif>
+
+	<cfif NOT len(variables.path)>
+	<!--- can't determine a proper path --->
+		<cfthrow type="Application" errorcode="plugins.farcryverity.verityservice" message="Collection path not defined." detail="A collection path for verity collections must be defined to use the Verity plugin." />
 	</cfif>
 	
 	<cfreturn this />
