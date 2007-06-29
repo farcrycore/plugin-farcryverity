@@ -17,7 +17,6 @@ Search Results
 <cfparam name="endrow" default="1">
 
 
-
 <cfset lAllCollections = application.stplugins.farcryverity.oVerityConfig.getCollectionList() />
 <cfset aAllCollections = application.stplugins.farcryverity.oVerityConfig.getCollectionArray() />
 
@@ -139,7 +138,7 @@ Search Results
 			</tr>
 			<tr>
 				<td><label for="action">&nbsp;</label></td>
-				<td><input type="submit" value="Refine Search" name="action" class="f-submit" /></td>
+				<td><input type="submit" value="Search" name="action" class="f-submit" /></td>
 			</tr>
 			</table>
 
