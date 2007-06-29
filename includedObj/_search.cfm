@@ -9,6 +9,7 @@ Search Results
 <!--- import tag libraries --->
 <cfimport taglib="/farcry/core/tags/webskin" prefix="skin">
 <cfimport taglib="/farcry/core/tags/widgets" prefix="widgets" /> 
+<cfimport taglib="/farcry/core/tags/formtools" prefix="ft" /> 
 
 <!--- default local vars --->
 <cfparam name="thispage" default="1">
@@ -23,13 +24,12 @@ Search Results
 <cfoutput>
 <style type="text/css">
 	 
-	.pagination {background: ##f2f2f2;color:##666;padding: 4px 2px 4px 7px;border: 1px solid ##ddd;margin: 0 0 1.5em}
-	.pagination p {position:relative;text-align:right}
-	.pagination p a:link, .pagination p a:visited, .pagination p a:hover, .pagination p a:active {text-decoration:none;background:##fff;padding:2px 5px;border: 1px solid ##ccc}
-	.pagination p a:hover {background:##c00;color:##fff}
-	.pagination p span {text-decoration:none;background:##fff;padding:2px 5px;border: 1px solid ##ccc;color:##ccc}
-	.pagination * {margin:0}
-	.pagination h4 {margin-top:-1.45em;padding:0;border:none}
+	##pagination {background: ##f2f2f2;color:##666;padding: 4px 2px 4px 7px;border: 1px solid ##ddd;margin: 5px 0px 5px 0px;}
+	##pagination {position:relative;text-align:right}
+	##pagination a:link, ##pagination a:visited, ##pagination a:hover, ##pagination a:active {text-decoration:none;background:##fff;color:##333;padding:2px 5px;border: 1px solid ##ccc}
+	##pagination a:hover {background:##aaa;color:##fff}
+	##pagination span {text-decoration:none;background:##fff;padding:2px 5px;border: 1px solid ##ccc;color:##ccc}
+	##pagination h4 {float:left;margin:0px;}
 
 </style>
 </cfoutput>
@@ -104,11 +104,11 @@ Search Results
 <cfparam name="qResults.recordCount" default="0">
 <cfparam name="stQueryStatus" default="#structNew()#">
 
-
+<ft:form action="#application.url.conjurer#?objectid=#application.navid.search#">
 <cfoutput>
 	<h1>Search results</h1>
-
-		<form action="#application.url.conjurer#?objectid=#application.navid.search#" method="post" id="searchForm" >
+	
+		
 			<fieldset>
 			<table>
 			<tr>
@@ -138,7 +138,7 @@ Search Results
 			</tr>
 			<tr>
 				<td><label for="action">&nbsp;</label></td>
-				<td><input type="submit" value="Search" name="action" class="f-submit" /></td>
+				<td><ft:farcryButton value="search" /></td>
 			</tr>
 			</table>
 
@@ -146,14 +146,16 @@ Search Results
 				
 
 			</fieldset>
-		</form>
+
 </cfoutput>
+
+</ft:form>
 
 <!--- work out page counter --->
 <cfif isDefined("url.pg")>
 	<cfset thispage = url.pg>
 </cfif>
-<cfset ResultsPerPage = 10>
+<cfset ResultsPerPage = 2>
 <cfset startrow = (thispage * ResultsPerPage) - (ResultsPerPage - 1)>
 <cfset endpage = ceiling(qResults.recordcount/ResultsPerPage)>
 <cfset currentpage = 1>
@@ -185,9 +187,10 @@ Search Results
 		<cfset urlParameters = "&objectid=#url.objectid#&criteria=#form.criteria#&searchOperator=#form.searchOperator#">
 		</cfoutput>
 		<cfif qResults.recordcount gt ResultsPerPage>
-			<cfoutput><div class="pagination"></cfoutput>
+			
 				<widgets:paginationDisplay
 			        QueryRecordCount="#qResults.recordcount#"
+			        DivStyle="pagination"
 			        FileName="#cgi.script_name#"
 			        MaxresultPages="5"
 			        MaxRowsAllowed="#ResultsPerPage#"
@@ -202,14 +205,14 @@ Search Results
 			        Layout_preNext="<strong>"
 			        Layout_postNext="</strong>"
 			        Layout_postPrevious="</strong>"
-			        Layout_prePrevious="<strong>">
-			<cfoutput></div></cfoutput>
+			        Layout_prePrevious="<strong>"
+			        showCurrentPageDetails=true >
         </cfif>
 	<!--- output results --->
 	<cfloop query="qResults" startrow="#startrow#" endrow="#endrow#">
 		<cfif len(qResults.custom1)>
 		<!--- we have a text match --->
-			<cfset oObject = createObject("component", "#evaluate('application.types.' & qResults.custom1 & '.typePath')#")>
+			<cfset oObject = createObject("component", application.stcoapi[qResults.custom1].packagepath)>
 			<cfset stSearchObject = oObject.getData(objectID=qResults.key) />
 			<cfset searchResultHTML = oObject.getView(stobject=stSearchObject, template="displaySearchResult", alternateHTML="")>
 			<cfif len(searchResultHTML)>
@@ -237,13 +240,13 @@ Search Results
 				</cfquery>
 
 				<cfif qFile.recordcount and not qFile.bMemberRestricted>
-					<cfset oFileObject = createObject("component", "#evaluate('application.types.dmFile.typePath')#")>
+					<cfset oFileObject = createObject("component", application.stcoapi.dmFile.packagepath)>
 					<cfset fileHTML = oFileObject.getView(objectid=qFile.objectid, template="displaySearchResult")>
 					<cfoutput>#fileHTML#</cfoutput>
 				<cfelse>
 					<!--- check if file is member only and only show if a member is logged in--->
 					<cfif qFile.recordcount and qFile.bMemberRestricted and session.steelweb.bLoggedIn>
-						<cfset oFileObject = createObject("component", "#evaluate('application.types.dmFile.typePath')#")>
+						<cfset oFileObject = createObject("component", application.stcoapi.dmFile.packagepath)>
 						<cfset fileHTML = oFileObject.getView(objectid=qFile.objectid, template="displaySearchResult")>
 						<cfoutput>#fileHTML#</cfoutput>
 					</cfif>
@@ -253,9 +256,9 @@ Search Results
 	</cfloop>
 	<!--- show previous/next links --->
 		<cfif qResults.recordcount gt ResultsPerPage>
-			<cfoutput><div class="pagination p-bottom"></cfoutput>
 			<widgets:paginationDisplay
 			        QueryRecordCount="#qResults.recordcount#"
+			        DivStyle="pagination"
 			        FileName="#cgi.script_name#"
 			        MaxresultPages="5"
 			        MaxRowsAllowed="#ResultsPerPage#"
@@ -270,8 +273,8 @@ Search Results
 			        Layout_preNext="<strong>"
 			        Layout_postNext="</strong>"
 			        Layout_postPrevious="</strong>"
-			        Layout_prePrevious="<strong>"><cfoutput>
-	        </div></cfoutput>
+			        Layout_prePrevious="<strong>"
+			        showCurrentPageDetails=true >
         </cfif>
 <cfelse>
 	<cfoutput>
