@@ -8,7 +8,7 @@ Search Results
 
 <!--- import tag libraries --->
 <cfimport taglib="/farcry/core/tags/webskin" prefix="skin">
-<cfimport taglib="/farcry/projects/farcry_bslau/tags" prefix="tags" />
+<cfimport taglib="/farcry/core/tags/widgets" prefix="widgets" /> 
 
 <!--- default local vars --->
 <cfparam name="thispage" default="1">
@@ -21,7 +21,19 @@ Search Results
 <cfset lAllCollections = application.stplugins.farcryverity.oVerityConfig.getCollectionList() />
 <cfset aAllCollections = application.stplugins.farcryverity.oVerityConfig.getCollectionArray() />
 
+<cfoutput>
+<style type="text/css">
+	 
+	.pagination {background: ##f2f2f2;color:##666;padding: 4px 2px 4px 7px;border: 1px solid ##ddd;margin: 0 0 1.5em}
+	.pagination p {position:relative;text-align:right}
+	.pagination p a:link, .pagination p a:visited, .pagination p a:hover, .pagination p a:active {text-decoration:none;background:##fff;padding:2px 5px;border: 1px solid ##ccc}
+	.pagination p a:hover {background:##c00;color:##fff}
+	.pagination p span {text-decoration:none;background:##fff;padding:2px 5px;border: 1px solid ##ccc;color:##ccc}
+	.pagination * {margin:0}
+	.pagination h4 {margin-top:-1.45em;padding:0;border:none}
 
+</style>
+</cfoutput>
 
 <cfparam name="form.advancedOptions" default="" />
 
@@ -142,7 +154,7 @@ Search Results
 <cfif isDefined("url.pg")>
 	<cfset thispage = url.pg>
 </cfif>
-<cfset ResultsPerPage = 20>
+<cfset ResultsPerPage = 10>
 <cfset startrow = (thispage * ResultsPerPage) - (ResultsPerPage - 1)>
 <cfset endpage = ceiling(qResults.recordcount/ResultsPerPage)>
 <cfset currentpage = 1>
@@ -155,33 +167,31 @@ Search Results
 <cfif isDefined("qResults") AND qResults.recordCount gt 0>
 	<cfoutput>
 	<h6>Your search returned <span class="highlight">#qResults.recordCount#</span> results.</h6>
-	<cfif structKeyExists(stQueryStatus, "suggestedquery")>
-		<cfset request.inHead.prototypeLite = 1 />
+	<cfif structKeyExists(stQueryStatus, "suggestedquery")>		<cfif 	REFindNoCase(" and ", stQueryStatus.suggestedquery)OR
+			REFindNoCase("\Aand ",stQueryStatus.suggestedquery)OR
+			REFindNoCase(" and\Z",stQueryStatus.suggestedquery)OR
+			REFindNoCase(" or ",stQueryStatus.suggestedquery)OR
+			REFindNoCase("\Aor ",stQueryStatus.suggestedquery)OR
+			REFindNoCase(" or\Z",stQueryStatus.suggestedquery)OR
+			REFindNoCase(" not ",stQueryStatus.suggestedquery)OR
+			REFindNoCase("\Anot ",stQueryStatus.suggestedquery)OR
+			REFindNoCase(" not\Z",stQueryStatus.suggestedquery)>
+			<cfset stQueryStatus.suggestedquery =  replaceList(stQueryStatus.suggestedquery," AND , OR , NOT , and , or , not ", " , , , , , ") />
+		</cfif>
+		<cfset request.inHead.PrototypeLite = 1 />
 		<p>Did you mean: "<a href="##" onclick="$('criteria2').value='#stQueryStatus.suggestedquery#';$('searchForm').submit();">#stQueryStatus.suggestedquery#"</a></p>
 	</cfif>
 	
-	
-	<p>
-	Didn't find what you were looking for? Try our
-	</cfoutput>
 
-<!--- 	<skin:buildLink objectid="#application.navid.advancedSearch#"><cfoutput>Advanced Search</cfoutput></skin:buildLink>
-	<cfoutput> or go to </cfoutput> --->
-	<skin:buildLink objectid="#application.navid.faqs#"><cfoutput>FAQs</cfoutput></skin:buildLink>
-	<cfoutput> or </cfoutput>
-	<skin:buildLink objectid="#application.navid.sitemap#"><cfoutput>Site Map</cfoutput></skin:buildLink>
-
-	<cfoutput>
-	</p>
 		<cfset urlParameters = "&objectid=#url.objectid#&criteria=#form.criteria#&searchOperator=#form.searchOperator#">
 		</cfoutput>
 		<cfif qResults.recordcount gt ResultsPerPage>
 			<cfoutput><div class="pagination"></cfoutput>
-				<tags:paginationDisplay
+				<widgets:paginationDisplay
 			        QueryRecordCount="#qResults.recordcount#"
 			        FileName="#cgi.script_name#"
 			        MaxresultPages="5"
-			        MaxRowsAllowed="20"
+			        MaxRowsAllowed="#ResultsPerPage#"
 			        bEnablePageNumber="true"
 			        LayoutNumber="4"
 			        FirstLastPage="numeric"
@@ -245,11 +255,11 @@ Search Results
 	<!--- show previous/next links --->
 		<cfif qResults.recordcount gt ResultsPerPage>
 			<cfoutput><div class="pagination p-bottom"></cfoutput>
-			<tags:paginationDisplay
+			<widgets:paginationDisplay
 			        QueryRecordCount="#qResults.recordcount#"
 			        FileName="#cgi.script_name#"
 			        MaxresultPages="5"
-			        MaxRowsAllowed="20"
+			        MaxRowsAllowed="#ResultsPerPage#"
 			        bEnablePageNumber="true"
 			        LayoutNumber="4"
 			        FirstLastPage="numeric"
@@ -268,7 +278,17 @@ Search Results
 	<cfoutput>
 	<div style="margin:0 0 10px 30px;">Your search for "#form.criteria#" produced no results.</div>
 	
-	<cfif structKeyExists(stQueryStatus, "suggestedquery")>
+	<cfif structKeyExists(stQueryStatus, "suggestedquery")>		<cfif 	REFindNoCase(" and ", stQueryStatus.suggestedquery)OR
+			REFindNoCase("\Aand ",stQueryStatus.suggestedquery)OR
+			REFindNoCase(" and\Z",stQueryStatus.suggestedquery)OR
+			REFindNoCase(" or ",stQueryStatus.suggestedquery)OR
+			REFindNoCase("\Aor ",stQueryStatus.suggestedquery)OR
+			REFindNoCase(" or\Z",stQueryStatus.suggestedquery)OR
+			REFindNoCase(" not ",stQueryStatus.suggestedquery)OR
+			REFindNoCase("\Anot ",stQueryStatus.suggestedquery)OR
+			REFindNoCase(" not\Z",stQueryStatus.suggestedquery)>
+			<cfset stQueryStatus.suggestedquery =  replaceList(stQueryStatus.suggestedquery," AND , OR , NOT , and , or , not ", " , , , , , ") />
+		</cfif>
 		<cfset request.inHead.PrototypeLite = 1 />
 		<p>Did you mean: "<a href="##" onclick="$('criteria2').value='#stQueryStatus.suggestedquery#';$('searchForm').submit();">#stQueryStatus.suggestedquery#"</a></p>
 	</cfif>
