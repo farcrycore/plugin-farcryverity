@@ -167,7 +167,7 @@ Search Results
 </cfif>
 <cfif isDefined("qResults") AND qResults.recordCount gt 0>
 	<cfoutput>
-	<h6>Your search returned <span class="highlight">#qResults.recordCount#</span> results.</h6>
+	<h6>Showing #startrow# to #endrow# of <span class="highlight">#qResults.recordCount#</span> results.</h6>
 	<cfif structKeyExists(stQueryStatus, "suggestedquery")>		<cfif 	REFindNoCase(" and ", stQueryStatus.suggestedquery)OR
 			REFindNoCase("\Aand ",stQueryStatus.suggestedquery)OR
 			REFindNoCase(" and\Z",stQueryStatus.suggestedquery)OR
