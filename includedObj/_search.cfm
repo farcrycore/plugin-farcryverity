@@ -180,7 +180,7 @@ Search Results
 			<cfset stQueryStatus.suggestedquery =  replaceList(stQueryStatus.suggestedquery," AND , OR , NOT , and , or , not ", " , , , , , ") />
 		</cfif>
 		<cfset request.inHead.PrototypeLite = 1 />
-		<p>Did you mean: "<a href="##" onclick="$('criteria2').value='#stQueryStatus.suggestedquery#';$('searchForm').submit();">#stQueryStatus.suggestedquery#"</a></p>
+		<p>Did you mean: "<a href="##" onclick="$('criteria2').value='#stQueryStatus.suggestedquery#';$('searchForm').submit();">#stQueryStatus.suggestedquery#"</a> ?</p>
 	</cfif>
 	
 
@@ -292,7 +292,7 @@ Search Results
 			<cfset stQueryStatus.suggestedquery =  replaceList(stQueryStatus.suggestedquery," AND , OR , NOT , and , or , not ", " , , , , , ") />
 		</cfif>
 		<cfset request.inHead.PrototypeLite = 1 />
-		<p>Did you mean: "<a href="##" onclick="$('criteria2').value='#stQueryStatus.suggestedquery#';$('searchForm').submit();">#stQueryStatus.suggestedquery#"</a></p>
+		<p>Did you mean: "<a href="##" onclick="$('criteria2').value='#stQueryStatus.suggestedquery#';$('searchForm').submit();">#stQueryStatus.suggestedquery#"</a> ?</p>
 	</cfif>
 
 	</cfoutput>
