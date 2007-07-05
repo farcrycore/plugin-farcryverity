@@ -104,49 +104,49 @@ Search Results
 <cfparam name="qResults.recordCount" default="0">
 <cfparam name="stQueryStatus" default="#structNew()#">
 
-<ft:form action="#application.url.conjurer#?objectid=#application.navid.search#">
+<ft:form action="#application.url.conjurer#?objectid=#application.navid.search#" name="searchForm">
 <cfoutput>
-	<h1>Search results</h1>
 	
-		
-			<fieldset>
-			<table>
-			<tr>
-				<td><label for="criteria2">You searched for:</label></td>
-				<td><input type="text" name="criteria" id="criteria2" value="#form.criteria#" /></td>
-			</tr>
-			<tr>
-				<td><label for="searchOperator">Search Operator:</label></td>
-				<td>
-					<select name="searchOperator">
-						<option value="ANY"<cfif form.SearchOperator EQ "ANY" OR form.SearchOperator EQ ""> selected="selected"</cfif>>Any of these words</option>
-					  	<option value="ALL"<cfif form.SearchOperator EQ "ALL"> selected="selected"</cfif>>All of these words</option>
-					  	<option value="PHRASE"<cfif form.SearchOperator EQ "PHRASE"> selected="selected"</cfif>>These words as a phrase</option>
-					</select>
-				</td>
-			</tr>
-			<tr>
-				<td><label for="advancedOptions">Advanced Options:</label></td>
-				<td>
-					<select name="advancedOptions">
-						<option value="all"<cfif form.advancedOptions EQ "all" OR  form.advancedOptions EQ ""> selected="selected"</cfif>>All Content</option>
-						<cfloop from="1" to="#arrayLen(aAllCollections)#" index="i">
-							<option value="#aAllCollections[i].collectionname#"<cfif form.advancedOptions EQ aAllCollections[i].collectionname> selected="selected"</cfif>>#aAllCollections[i].title#</option>
-						</cfloop>
-					</select>
-				</td>
-			</tr>
-			<tr>
-				<td><label for="action">&nbsp;</label></td>
-				<td><ft:farcryButton value="search" /></td>
-			</tr>
-			</table>
+	<h1>Search results</h1>	
+	<div class="bodySearchParameters" style="">	
+		<fieldset>
+		<table>
+		<tr>
+			<td><label for="criteria2">You searched for:</label></td>
+			<td><input type="text" name="criteria" id="criteria2" value="#form.criteria#" /></td>
+		</tr>
+		<tr>
+			<td><label for="searchOperator">Search Operator:</label></td>
+			<td>
+				<select name="searchOperator">
+					<option value="ANY"<cfif form.SearchOperator EQ "ANY" OR form.SearchOperator EQ ""> selected="selected"</cfif>>Any of these words</option>
+				  	<option value="ALL"<cfif form.SearchOperator EQ "ALL"> selected="selected"</cfif>>All of these words</option>
+				  	<option value="PHRASE"<cfif form.SearchOperator EQ "PHRASE"> selected="selected"</cfif>>These words as a phrase</option>
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<td><label for="advancedOptions">Advanced Options:</label></td>
+			<td>
+				<select name="advancedOptions">
+					<option value="all"<cfif form.advancedOptions EQ "all" OR  form.advancedOptions EQ ""> selected="selected"</cfif>>All Content</option>
+					<cfloop from="1" to="#arrayLen(aAllCollections)#" index="i">
+						<option value="#aAllCollections[i].collectionname#"<cfif form.advancedOptions EQ aAllCollections[i].collectionname> selected="selected"</cfif>>#aAllCollections[i].title#</option>
+					</cfloop>
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<td><label for="action">&nbsp;</label></td>
+			<td><ft:farcryButton value="search" /></td>
+		</tr>
+		</table>
 
-				
-				
+			
+			
 
-			</fieldset>
-
+		</fieldset>
+	</div>
 </cfoutput>
 
 </ft:form>
@@ -278,7 +278,7 @@ Search Results
         </cfif>
 <cfelse>
 	<cfoutput>
-	<div style="margin:0 0 10px 30px;">Your search for "#form.criteria#" produced no results.</div>
+	<h6>Your search for "#form.criteria#" produced no results.</h6>
 	
 	<cfif structKeyExists(stQueryStatus, "suggestedquery")>		<cfif 	REFindNoCase(" and ", stQueryStatus.suggestedquery)OR
 			REFindNoCase("\Aand ",stQueryStatus.suggestedquery)OR
