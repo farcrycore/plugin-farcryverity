@@ -1,15 +1,16 @@
-<cfsetting enablecfoutputonly="yes">
+<cfsetting enablecfoutputonly="true" />
 <!--------------------------------------------------------------------
 Search Results
  - dmInclude (_search.cfm)
 --------------------------------------------------------------------->
 <!--- @@displayname: Search Results Page --->
-<!--- @@author: Gavin Stewart (gavin@daemon.com.au) --->
+<!--- @@author: Geoff Bowers (modius@daemon.com.au) --->
 
 <!--- import tag libraries --->
 <cfimport taglib="/farcry/core/tags/webskin" prefix="skin">
 <cfimport taglib="/farcry/core/tags/widgets" prefix="widgets" /> 
 <cfimport taglib="/farcry/core/tags/formtools" prefix="ft" /> 
+<cfimport taglib="/farcry/plugins/farcryverity/tags/" prefix="verity" /> 
 
 <!--- default local vars --->
 <cfparam name="thispage" default="1">
@@ -98,8 +99,9 @@ Search Results
 </cfswitch>
 <!--- get serach results --->
 <cfif len(form.criteria)>
-	<cfsearch collection="#lCollections#" criteria="#searchCriteria#" name="qResults" maxrows="1000" suggestions="10" status="stQueryStatus" type="internet">
-	
+	<cfsearch collection="#lCollections#"  criteria="#searchCriteria#" name="qResults" maxrows="1000" suggestions="10" status="stQueryStatus" type="internet">
+	<verity:searchlog status="#stQueryStatus#" type="internet" lcollections="#lCollections#" criteria="#searchCriteria#" />
+	<cfdump var="#stQueryStatus#">
 </cfif>
 <cfparam name="qResults.recordCount" default="0">
 <cfparam name="stQueryStatus" default="#structNew()#">
