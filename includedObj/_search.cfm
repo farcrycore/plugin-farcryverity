@@ -101,7 +101,6 @@ Search Results
 <cfif len(form.criteria)>
 	<cfsearch collection="#lCollections#"  criteria="#searchCriteria#" name="qResults" maxrows="1000" suggestions="10" status="stQueryStatus" type="internet">
 	<verity:searchlog status="#stQueryStatus#" type="internet" lcollections="#lCollections#" criteria="#searchCriteria#" />
-	<cfdump var="#stQueryStatus#">
 </cfif>
 <cfparam name="qResults.recordCount" default="0">
 <cfparam name="stQueryStatus" default="#structNew()#">
