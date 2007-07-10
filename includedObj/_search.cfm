@@ -109,7 +109,6 @@ Search Results
 <ft:form action="#application.url.conjurer#?objectid=#application.navid.search#" name="searchForm">
 <cfoutput>
 	
-	<h1>Search results</h1>	
 	<div class="bodySearchParameters" style="">	
 		<fieldset>
 		<table>
