@@ -155,7 +155,7 @@ Search Results
 <cfif isDefined("url.pg")>
 	<cfset thispage = url.pg>
 </cfif>
-<cfset ResultsPerPage = 2>
+<cfset ResultsPerPage = 10>
 <cfset startrow = (thispage * ResultsPerPage) - (ResultsPerPage - 1)>
 <cfset endpage = ceiling(qResults.recordcount/ResultsPerPage)>
 <cfset currentpage = 1>
