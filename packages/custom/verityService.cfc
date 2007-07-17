@@ -109,8 +109,8 @@ $Developer: Geoff Bowers (modius@daemon.com.au) $
 		<!--- define custom fields ---> 
 		'#arguments.config.collectiontypename#' AS custom1,
 		'reserved for category' AS custom2,
-		'#arguments.config.custom3#' AS custom3,
-		'#arguments.config.custom4#' AS custom4,
+		<cfif len(arguments.config.custom3)>#arguments.config.custom3# AS custom3,</cfif>
+		<cfif len(arguments.config.custom4)>#arguments.config.custom4# AS custom4,</cfif>
 		<!--- standard columns --->
 		#lcolumns#
 	FROM #arguments.config.collectiontypename#
