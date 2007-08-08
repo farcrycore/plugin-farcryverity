@@ -111,6 +111,4 @@ VIEW:
 </cfif>
 </ft:form>
 
-<cfdump var="#stobj#">
-
 <cfsetting enablecfoutputonly="no">
