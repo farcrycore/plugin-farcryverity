@@ -13,6 +13,7 @@
 				<menuitem mergeType="merge" id="farcryveritymenuitem20" label="Host Synchronisation" link="/admin/customadmin.cfm?module=customlists/hostmanagement.cfm&amp;plugin=farcryverity" />
 				<menuitem mergeType="merge" id="farcryveritymenuitem21" label="Create Missing Collections" link="/admin/customadmin.cfm?module=customlists/createmissing.cfm&amp;plugin=farcryverity" />				
 				<menuitem mergeType="merge" id="farcryveritymenuitem22" label="Purge Redundant Configs" link="/admin/customadmin.cfm?module=customlists/purgeconfigs.cfm&amp;plugin=farcryverity" />
+				<menuitem mergeType="merge" id="farcryveritymenuitem23" label="Test Search" link="/admin/customadmin.cfm?plugin=farcryverity&amp;module=customlists/testsearch.cfm" />
 			</menu>
 
 			<menu mergeType="merge" id="farcryveritymenu3" label="Search Reports" labelType="value">
