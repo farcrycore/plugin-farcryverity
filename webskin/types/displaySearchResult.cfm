@@ -6,6 +6,11 @@
 	<dt>
 </cfoutput>
 <skin:buildlink objectid="#stObj.objectid#" target="blank">
+	<cfif structkeyexists(application.stCOAPI[stObj.typename],"icon")>
+		<cfoutput>
+			<img src="#application.stCOAPI[stObj.typename].icon#" class="icon" alt="#application.stCOAPI[stObj.typename].displayname#" border="0" style="float:left;" />
+		</cfoutput>
+	</cfif>
 	<cfoutput>#stObj.label#</cfoutput>
 </skin:buildlink>
 <cfoutput>
