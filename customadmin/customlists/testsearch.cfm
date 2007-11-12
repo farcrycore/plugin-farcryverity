@@ -213,11 +213,18 @@
 			<cfset oObject = createObject("component", application.stcoapi[qResults.custom1].packagepath)>
 			<cfset stSearchObject = oObject.getData(objectID=qResults.key) />
 			<cfset searchResultHTML = oObject.getView(stobject=stSearchObject, template="displaySearchResult", alternateHTML="")>
-			<cfoutput>
-				<dt></cfoutput><skin:buildLink objectid="#qResults.key#"><cfoutput>#qResults.title#</cfoutput></skin:buildLink><cfoutput></dt></cfoutput>
-				<cfoutput><dd class="desc">#qResults.summary# </cfoutput><skin:buildLink objectid="#qResults.key#"><cfoutput>Details</cfoutput></skin:buildLink><cfoutput></dd>
-				<dd class="date">#dateFormat(stSearchObject.datetimelastupdated, "dd mmmm yyyy")#</dd>
-			</cfoutput>
+			<cfif len(searchResultHTML)>
+				<cfoutput>#searchResultHTML#</cfoutput>
+			<cfelse>
+				<cfoutput>
+				<dl class="search">
+					<dt></cfoutput><skin:buildLink objectid="#qResults.key#"><cfoutput>#qResults.title#</cfoutput></skin:buildLink><cfoutput></dt></cfoutput>
+
+						<cfoutput><dd class="desc">#qResults.summary# </cfoutput><skin:buildLink objectid="#qResults.key#"><cfoutput>Details</cfoutput></skin:buildLink><cfoutput></dd>
+						<dd class="date">#dateFormat(stSearchObject.datetimelastupdated, "dd mmmm yyyy")#</dd>
+					</dl>
+				</cfoutput>
+			</cfif>
 		<cfelse>
 		<!--- we have a file match --->
 			<cfif len(qResults.key)>
