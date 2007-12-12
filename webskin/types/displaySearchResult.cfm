@@ -13,9 +13,6 @@
 	</cfif>
 	<cfoutput>#stObj.label#</cfoutput>
 </skin:buildlink>
-<cfoutput>
-	</dt>
-</cfoutput>
 
 <cfif structkeyexists(stObj,"teaser")>
 	<cfoutput>
@@ -33,7 +30,9 @@
 </cfif>
 
 <cfoutput>
-	<dd class="date">#dateFormat(stObj.datetimelastupdated, "dd mmmm yyyy")#</dd>
+		<dd class="date">Updated: #dateFormat(stObj.datetimelastupdated, "dd mmmm yyyy")#</dd>
+		<dd class="date">#application.stcoapi[stobj.typename].displayname#</dd>
+	</dt>
+	<br class="clear" />
 </cfoutput>
-
 <cfsetting enablecfoutputonly="false" />
