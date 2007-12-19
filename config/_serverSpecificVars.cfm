@@ -13,7 +13,7 @@
 <!--- set up verity service --->
 <cfif NOT structkeyExists(application.stplugins.farcryverity, "oVerityConfig")>
 	<cftry>
-		<cfset application.stplugins.farcryverity.oVerityConfig=createobject("component", "farcry.plugins.farcryverity.packages.custom.verityconfig").init() />
+		<cfset application.stplugins.farcryverity.oVerityConfig=createobject("component", "farcry.plugins.farcryverity.packages.custom.verityConfig").init() />
 		<cfcatch type="any">
 			<!--- warn that plugin is not installed.. but don't blow up --->
 			<cftrace type="warning" text="Problem initialising farcryverity plugin. Confirm types have been deployed." />

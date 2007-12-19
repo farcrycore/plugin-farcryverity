@@ -24,14 +24,14 @@ ENVIRONMENT
 ACTION
 ----------------------------------------->
 <ft:processForm action="create">
-	<cfset oVerity=createobject("component", "farcry.plugins.farcryverity.packages.custom.verityservice").init() />
-	<cfset stConfig=createobject("component", "farcry.plugins.farcryverity.packages.types.farveritycollection").getData(objectid=form.selectedobjectid) />
+	<cfset oVerity=createobject("component", "farcry.plugins.farcryverity.packages.custom.verityService").init() />
+	<cfset stConfig=createobject("component", "farcry.plugins.farcryverity.packages.types.farVerityCollection").getData(objectid=form.selectedobjectid) />
 	<cfset stresult=oVerity.createCollection(collection=stconfig.collectionname) />
 	<cfdump var="#stResult.message#" />
 </ft:processForm>
 
 <ft:processForm action="deleteCollection" >
-	<cfset oConfig=createobject("component", "farcry.plugins.farcryverity.packages.types.farveritycollection") />
+	<cfset oConfig=createobject("component", "farcry.plugins.farcryverity.packages.types.farVerityCollection") />
 	<cfloop list="#form.selectedobjectid#" index="id">
 		<cfset stresult=oConfig.delete(objectid=id) />
 		<cfdump var="#stResult.message#" />
@@ -39,22 +39,22 @@ ACTION
 </ft:processForm>
 
 <ft:processForm action="optimize" >
-	<cfset oVerity=createobject("component", "farcry.plugins.farcryverity.packages.custom.verityservice").init() />
-	<cfset stConfig=createobject("component", "farcry.plugins.farcryverity.packages.types.farveritycollection").getData(objectid=form.selectedobjectid) />
+	<cfset oVerity=createobject("component", "farcry.plugins.farcryverity.packages.custom.verityService").init() />
+	<cfset stConfig=createobject("component", "farcry.plugins.farcryverity.packages.types.farVerityCollection").getData(objectid=form.selectedobjectid) />
 	<cfset stresult=oVerity.optimizeCollection(collection=stconfig.collectionname) />
 	<cfdump var="#stResult.message#" />
 </ft:processForm>
 
 <ft:processForm action="update" >
-	<cfset oVerity=createobject("component", "farcry.plugins.farcryverity.packages.custom.verityservice").init() />
-	<cfset stConfig=createobject("component", "farcry.plugins.farcryverity.packages.types.farveritycollection").getData(objectid=form.selectedobjectid) />
+	<cfset oVerity=createobject("component", "farcry.plugins.farcryverity.packages.custom.verityService").init() />
+	<cfset stConfig=createobject("component", "farcry.plugins.farcryverity.packages.types.farVerityCollection").getData(objectid=form.selectedobjectid) />
 	<cfset stresult=oVerity.update(config=stconfig) />
 	<cfdump var="#stResult.message#" />
 </ft:processForm>
 
 <ft:processForm action="purge" >
-	<cfset oVerity=createobject("component", "farcry.plugins.farcryverity.packages.custom.verityservice").init() />
-	<cfset stConfig=createobject("component", "farcry.plugins.farcryverity.packages.types.farveritycollection").getData(objectid=form.selectedobjectid) />
+	<cfset oVerity=createobject("component", "farcry.plugins.farcryverity.packages.custom.verityService").init() />
+	<cfset stConfig=createobject("component", "farcry.plugins.farcryverity.packages.types.farVerityCollection").getData(objectid=form.selectedobjectid) />
 	<cfset stresult=oVerity.purge(collection=stconfig.collectionname) />
 	<cfdump var="#stResult.message#" />
 </ft:processForm>

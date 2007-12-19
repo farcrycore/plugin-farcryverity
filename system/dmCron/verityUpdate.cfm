@@ -7,9 +7,9 @@
 	where	hostname = '#lcase(application.sysinfo.machinename)#'
 </cfquery>
 
-<cfset oVerity=createobject("component", "farcry.plugins.farcryverity.packages.custom.verityservice").init() />
+<cfset oVerity=createobject("component", "farcry.plugins.farcryverity.packages.custom.verityService").init() />
 <cfloop query="qCollections">
-	<cfset stConfig=createobject("component", "farcry.plugins.farcryverity.packages.types.farveritycollection").getData(objectid=qCollections.objectid[currentrow]) />
+	<cfset stConfig=createobject("component", "farcry.plugins.farcryverity.packages.types.farVerityCollection").getData(objectid=qCollections.objectid[currentrow]) />
 	<cfset stresult=oVerity.update(config=stconfig) />
 	<cfoutput>
 		#stResult.message#<br/>

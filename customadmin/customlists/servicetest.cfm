@@ -22,8 +22,8 @@ ORDER BY title
 
 <cfparam name="url.verityaction" default="none" type="string" />
 <cfparam name="url.configid" default="#createUUID()#" type="uuid" />
-<cfset oVerity=createobject("component", "farcry.plugins.farcryverity.packages.custom.verityservice").init(path="C:\coldfusionverity\collections") />
-<cfset stConfig=createobject("component", "farcry.plugins.farcryverity.packages.types.farveritycollection").getData(objectid=url.configid) />
+<cfset oVerity=createobject("component", "farcry.plugins.farcryverity.packages.custom.verityService").init(path="C:\coldfusionverity\collections") />
+<cfset stConfig=createobject("component", "farcry.plugins.farcryverity.packages.types.farVerityCollection").getData(objectid=url.configid) />
 
 <cfswitch expression="#url.verityaction#">
 	

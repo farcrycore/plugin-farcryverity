@@ -40,7 +40,7 @@ $Developer: Geoff Bowers (modius@daemon.com.au) $
 
 	<cfif NOT len(variables.path)>
 	<!--- can't determine a proper path --->
-		<cfthrow type="Application" errorcode="plugins.farcryverity.verityservice" message="Collection path not defined." detail="A collection path for verity collections must be defined to use the Verity plugin." />
+		<cfthrow type="Application" errorcode="plugins.farcryverity.verityService" message="Collection path not defined." detail="A collection path for verity collections must be defined to use the Verity plugin." />
 	</cfif>
 	
 	<cfreturn this />
@@ -208,7 +208,7 @@ $Developer: Geoff Bowers (modius@daemon.com.au) $
 	
 	<!--- update builttodate if successful --->
 	<cfif stResult.bSuccess AND structkeyexists(arguments.config, "objectid")>
-		<cfset oVerityCollection=createobject("component", "farcry.plugins.farcryverity.packages.types.farveritycollection") />
+		<cfset oVerityCollection=createobject("component", "farcry.plugins.farcryverity.packages.types.farVerityCollection") />
 		<cfset stConfigProps=oVerityCollection.getData(objectid=arguments.config.objectid) />
 		<cfset stConfigProps.builttodate = qUpdates.datetimelastupdated[qUpdates.recordcount] />
 		<cfset stresult.builttodate = stConfigProps.builttodate />

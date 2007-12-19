@@ -62,7 +62,7 @@ afterSave(); synch with other host collections
 	
 	<cfset var stobj=getData(objectid=arguments.objectid) />
 	<cfset var stReturn=structNew() />
-	<cfset var oVerity=createobject("component", "farcry.plugins.farcryverity.packages.custom.verityservice").init() />
+	<cfset var oVerity=createobject("component", "farcry.plugins.farcryverity.packages.custom.verityService").init() />
 	
 	<cfset stReturn=super.delete(objectid=stobj.objectid, auditNote="Deleted configuration and associated collection for #stobj.collectionname#.")>
 	
@@ -245,7 +245,7 @@ library methods
 	<cfset var prop="" />
 	
 	<cfif NOT structkeyexists(application.stcoapi, arguments.typename)>
-		<cfthrow type="Application" errorcode="plugins.farcryverity.packages.types.farveritycollection" message="Typename (#arguments.typename#) is invalid." detail="The typename must be available in the application in order to build a collection." />
+		<cfthrow type="Application" errorcode="plugins.farcryverity.packages.types.farVerityCollection" message="Typename (#arguments.typename#) is invalid." detail="The typename must be available in the application in order to build a collection." />
 	</cfif>
 	
 	<cfloop collection="#application.stcoapi[arguments.typename].stProps#" item="prop">

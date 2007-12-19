@@ -31,7 +31,7 @@ ACTION:
 			<cfoutput><p><strong>Error</strong>: #qCheckCollectionName.label# already has a collection of the same name.</p></cfoutput> 
 			--->
 		<cfelse>
-			<cfset oVerity=createobject("component", "farcry.plugins.farcryverity.packages.custom.verityservice").init() />
+			<cfset oVerity=createobject("component", "farcry.plugins.farcryverity.packages.custom.verityService").init() />
 			<cfset verityResult=oVerity.createCollection(collection=stprops.collectionname) />
 			<cfdump var="#verityResult#">
 		</cfif>	

@@ -8,7 +8,7 @@ ENVIRONMENT
 
 <cfset qMissing=queryNew("objectid,collectionname,title,collectiontypename") />
 
-<cfset oVerity=createObject("component", "farcry.plugins.farcryverity.packages.custom.verityservice").init() />
+<cfset oVerity=createObject("component", "farcry.plugins.farcryverity.packages.custom.verityService").init() />
 <cfset qCollections=oVerity.getCollections() />
 
 <cfquery datasource="#application.dsn#" name="qHostConfigs">
@@ -49,7 +49,7 @@ ACTION
 
 		<cfoutput><h3>Create Verity Collections</h3></cfoutput>
 		
-		<cfset oVerity=createobject("component", "farcry.plugins.farcryverity.packages.custom.verityservice").init() />
+		<cfset oVerity=createobject("component", "farcry.plugins.farcryverity.packages.custom.verityService").init() />
 		<cfset ofvc=createObject("component", "farcry.plugins.farcryverity.packages.types.farVerityCollection") />
 
 		<cfloop query="qMissing">
