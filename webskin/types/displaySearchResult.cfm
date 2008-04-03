@@ -1,38 +1,42 @@
 <cfsetting enablecfoutputonly="true" />
 
+<!--- required libs --->
 <cfimport taglib="/farcry/core/tags/webskin" prefix="skin" />
 
-<cfoutput>
-	<dt>
-</cfoutput>
-<skin:buildlink objectid="#stObj.objectid#" target="blank">
-	<cfif structkeyexists(application.stCOAPI[stObj.typename],"icon")>
-		<cfoutput>
-			<img src="#application.stCOAPI[stObj.typename].icon#" class="icon" alt="#application.stCOAPI[stObj.typename].displayname#" border="0" style="float:left;" />
-		</cfoutput>
-	</cfif>
-	<cfoutput>#stObj.label#</cfoutput>
-</skin:buildlink>
-
-<cfif structkeyexists(stObj,"teaser")>
-	<cfoutput>
-		<dd>
-			#stObj.teaser#
-	</cfoutput>
-	
-	<skin:buildlink objectid="#stObj.objectid#" target="_blank">
-		<cfoutput>more...</cfoutput>
-	</skin:buildlink>
-	
-	<cfoutput>
-		</dd>
-	</cfoutput>
+<!--- determine whether to use teaser or verity summary --->
+<cfif structKeyExists(stObj,"teaser") AND len(trim(stObj.teaser))>
+	<cfset summary = trim(stObj.teaser) />
+<cfelse>
+	<cfset summary = trim(stParam.summary) />
 </cfif>
 
+<!--- highlight matches --->
+<cfloop list="#stParam.searchTerms#" delimiters="|" index="i">
+	<cfset summary = replaceNoCase(summary,i,"<span class='highlight'>#i#</span>", "all") />
+</cfloop>
+
 <cfoutput>
-		<dd class="date">Updated: #dateFormat(stObj.datetimelastupdated, "dd mmmm yyyy")#</dd>
-		<dd class="date">#application.stcoapi[stobj.typename].displayname#</dd>
-	</dt>
-	<br class="clear" />
+	<dl>
+		<div class="rank">#stParam.rank#.</div>
+		<dt>
+			</cfoutput>
+			<skin:buildlink objectid="#stObj.objectID#">
+				<cfoutput><cfif len(stParam.title)>#stParam.title#<cfelse>#stObj.label#</cfif></cfoutput>
+			</skin:buildlink>
+			<cfoutput>
+		</dt>
+		<dd class="summary">
+			</cfoutput>
+			<cfoutput>#summary#</cfoutput>
+			<cfif right(summary,3) EQ "...">
+				<skin:buildlink objectid="#stObj.objectID#">more</skin:buildlink>
+			</cfif>
+			<cfoutput>
+		</dd>
+		<dd class="footer">
+			#application.stCoapi[stobj.typeName].displayName# | #dateFormat(stObj.dateTimeLastUpdated, "dd mmmm yyyy")#
+		</dd>
+	</dl>
 </cfoutput>
+
 <cfsetting enablecfoutputonly="false" />
