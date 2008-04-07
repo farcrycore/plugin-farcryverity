@@ -4,9 +4,9 @@
 <cfimport taglib="/farcry/core/tags/formtools" prefix="ft" />
 
 <ft:form action="#application.url.conjurer#?objectID=#application.navID.search#" name="searchForm">
-		
+
 <cfoutput>
-	<div id="fc-searchForm">
+	<div id="vp-searchform">
 		<table>
 		<tr>
 			<td><label for="criteria2">You searched for:</label></td>
@@ -22,7 +22,7 @@
 				  	<option value="phrase"<cfif form.searchOperator EQ "phrase"> selected="selected"</cfif>>These words as a phrase</option>
 				</select>
 			</td>
-			<td></td>			
+			<td></td>
 		</tr>
 		<tr>
 			<td><label for="advancedOptions">Advanced Options:</label></td>
@@ -34,12 +34,12 @@
 					</cfloop>
 				</select>
 			</td>
-			<td><ft:farcryButton value="Search" /></td>		
+			<td><ft:farcryButton value="Search" /></td>
 		</tr>
 		</table>
 	</div>
 </cfoutput>
-	
+
 </ft:form>
 
 <cfsetting enablecfoutputonly="false" />
