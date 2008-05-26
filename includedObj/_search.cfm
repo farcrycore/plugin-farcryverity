@@ -14,6 +14,7 @@ Search Results
 <cfparam name="resultsPerPage" default="10" type="numeric" />
 <cfparam name="maxResultPages" default="5" type="numeric" />
 <cfparam name="maxResults" default="1000" type="numeric" />
+<cfparam name="highlightMatches" default="false" type="boolean" />
 
 <!--- default local vars --->
 <cfparam name="thispage" default="1" type="numeric" />
@@ -32,13 +33,6 @@ Search Results
 <cfset lAllCollections = application.stPlugins.farcryVerity.oVerityConfig.getCollectionList() />
 <cfset aAllCollections = application.stPlugins.farcryVerity.oVerityConfig.getCollectionArray() />
 
-<!--- setup the collections to search on, this may depend on the form value passed in on the search results page --->
-<cfif form.advancedOptions EQ "all">
-	<cfset lCollections = lAllCollections />
-<cfelse>
-	<cfset lCollections = form.advancedOptions />
-</cfif>
-
 <!--- inbound parameters defaults --->
 <cfif structKeyExists(form,"criteria2")>
 	<cfset form.criteria=form.criteria2 />
@@ -49,8 +43,18 @@ Search Results
 <cfif structKeyExists(url,"searchOperator")>
 	<cfset form.searchOperator = url.searchOperator />
 </cfif>
+<cfif structKeyExists(url, "advancedOptions")>
+	<cfset form.advancedOptions = url.advancedOptions />
+</cfif>
 <cfif structKeyExists(url,"pg")>
 	<cfset thisPage = url.pg />
+</cfif>
+
+<!--- setup the collections to search on, this may depend on the form value passed in on the search results page --->
+<cfif form.advancedOptions EQ "all">
+	<cfset lCollections = lAllCollections />
+<cfelse>
+	<cfset lCollections = form.advancedOptions />
 </cfif>
 
 <cfset searchCriteria = formatCriteria(criteria=form.criteria,searchOperator=form.searchOperator) />
@@ -109,12 +113,17 @@ Search Results
 	<!--- display search results --->
 	<cfloop query="qResults" startrow="#startrow#" endrow="#endrow#">
 		<!--- setup stParam to pass verity vars to webskin --->
-		<cfset stParam.searchTerms = replaceList(lcase(searchCriteria)," or , and , not ","|,|,|") />
+		<cfset stParam.searchCriteria = searchCriteria />
 		<cfset stParam.rank = qResults.rank />
 		<cfset stParam.score = qResults.score />
 		<cfset stParam.summary = stripHTML(qResults.summary) />
 		<cfset stParam.title = qResults.title />
 		<cfset stParam.key = qResults.key />
+		<cfif highlightMatches>
+			<cfset stParam.summary = highlightSummary(searchCriteria) />
+		<cfelse>
+			<cfset stParam.summary = stripHTML(qResults.summary) />
+		</cfif>
 		<!--- create object of result type, render webskin --->
 		<cfset oProperty = createObject("component", application.stCoapi[qResults.custom1].packagePath) />
 		<cfset stProperty = oProperty.getData(objectID=qResults.key) />
@@ -124,7 +133,7 @@ Search Results
 
 	<!--- pagination bottom --->
 	<cfif qResults.recordCount GT resultsPerPage>
-		<cfset urlParameters = "&objectID=#url.objectID#&criteria=#form.criteria#&searchOperator=#form.searchOperator#" />
+		<cfset urlParameters = "&objectID=#url.objectID#&criteria=#form.criteria#&searchOperator=#form.searchOperator#&advancedOptions=#form.advancedOptions#" />
 		<widgets:paginationDisplay
 			QueryRecordCount="#qResults.recordCount#"
 			DivStyle="vp-pagination"
@@ -235,6 +244,20 @@ Search Results
 	<cfset suggestHTML = "<p>Did you mean <a href=""##"" onclick=""$('criteria2').value='#suggestedQuery#';$('searchForm').submit();""><em>#suggestedQuery#</em></a> ?</p>" />
 
 	<cfreturn suggestHTML />
+</cffunction>
+
+<cffunction name="highlightSummary" returntype="string" access="private" description="wraps span highlight class around matching terms in summary" output="false">
+	<cfargument name="searchCriteria" required="true" type="string" />
+
+	<cfset var summaryHightlightHTML = "" />
+	<cfset var searchTerms = replaceList(lcase(arguments.searchCriteria)," or , and , not ","|,|,|") />
+
+	<!--- highlight matches --->
+	<cfloop list="#searchTerms#" delimiters="|" index="i">
+		<cfset summaryHightlightHTML = replaceNoCase(summary,i,"<span class='searchhighlight'>#i#</span>", "all") />
+	</cfloop>
+
+	<cfreturn summaryHightlightHTML />
 </cffunction>
 
 <cfsetting enablecfoutputonly="false" />
