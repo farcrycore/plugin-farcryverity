@@ -3,18 +3,12 @@
 <!--- required libs --->
 <cfimport taglib="/farcry/core/tags/webskin" prefix="skin" />
 
-
 <!--- determine whether to use teaser or verity summary --->
 <cfif structKeyExists(stObj,"teaser") AND len(trim(stObj.teaser))>
 	<cfset summary = trim(stObj.teaser) />
 <cfelse>
 	<cfset summary = trim(stParam.summary) />
 </cfif>
-
-<!--- highlight matches --->
-<cfloop list="#stParam.searchTerms#" delimiters="|" index="i">
-	<cfset summary = replaceNoCase(summary,i,"<span class='searchhighlight'>#i#</span>", "all") />
-</cfloop>
 
 <cfoutput>
 	<div id="vp-searchresult">
