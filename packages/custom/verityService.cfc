@@ -207,7 +207,7 @@ $Developer: Geoff Bowers (modius@daemon.com.au) $
 	</cftry>
 	
 	<!--- update builttodate if successful --->
-	<cfif stResult.bSuccess AND structkeyexists(arguments.config, "objectid")>
+	<cfif stResult.bSuccess AND structkeyexists(arguments.config, "objectid") and qUpdates.recordcount>
 		<cfset oVerityCollection=createobject("component", "farcry.plugins.farcryverity.packages.types.farVerityCollection") />
 		<cfset stConfigProps=oVerityCollection.getData(objectid=arguments.config.objectid) />
 		<cfset stConfigProps.builttodate = qUpdates.datetimelastupdated[qUpdates.recordcount] />
