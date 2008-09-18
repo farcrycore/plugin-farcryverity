@@ -30,7 +30,7 @@ type properties
 <cfproperty ftseq="43" ftfieldset="Advanced Options" name="fileproperty" type="string" hint="Associated file collection will be based on this filepath property if activated." required="no" default="" fttype="list" ftlistdata="getIndexFilePaths" ftlabel="File Collection" />
 <cfproperty ftseq="44" ftfieldset="Advanced Options" name="catCollection" type="string" hint="Category filter for collection." required="no" default="" fttype="category" ftalias="root" ftlabel="Category Filter" />
 
-<cfproperty ftseq="61" ftfieldset="Operational" name="builttodate" type="date" hint="The date the collection was last built to.  Can be manually overridden to force collection to update from the specified point, based on typename datetimelastupdated." required="yes" default="01-JAN-70" fttype="datetime" ftlabel="Built To date" />
+<cfproperty ftseq="61" ftfieldset="Operational" name="builttodate" type="date" hint="The date the collection was last built to.  Can be manually overridden to force collection to update from the specified point, based on typename datetimelastupdated." required="yes" default="{ts '1970-01-01 00:00:00'}" fttype="datetime" ftlabel="Built To date" />
 <cfproperty ftseq="62" ftfieldset="Operational" name="bEnableSearch" type="boolean" hint="Enable search; by default new collections start as disabled." required="no" default="" ftlabel="Enable Search?" />
 
 <!------------------------------------------------------------------------
