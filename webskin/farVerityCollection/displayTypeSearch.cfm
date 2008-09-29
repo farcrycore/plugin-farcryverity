@@ -1,21 +1,13 @@
 <cfsetting enablecfoutputonly="true" />
-<!--------------------------------------------------------------------
-Search Results
- - dmInclude (_search.cfm)
---------------------------------------------------------------------->
+
 <!--- @@displayname: Search Results Page --->
 <!--- @@author: Geoff Bowers (modius@daemon.com.au) --->
 
-<farcry:deprecated message="Search Include page should be replaced with type webskin in the tree" />
-<cflocation url="#application.url.conjuror#&type=farVerityCollection&bodyView=displayTypeSearch" addtoken="false" />
-
-
-
-
-
 <!--- import tag libraries --->
-<cfimport taglib="/farcry/core/tags/widgets" prefix="widgets" />
 <cfimport taglib="/farcry/plugins/farcryverity/tags/" prefix="verity" />
+<cfimport taglib="/farcry/core/tags/webskin" prefix="skin" />
+<cfimport taglib="/farcry/core/tags/formtools" prefix="ft" />
+<cfimport taglib="/farcry/core/tags/extjs" prefix="extjs" />
 
 <!--- config vars --->
 <cfparam name="resultsPerPage" default="10" type="numeric" />
@@ -24,11 +16,6 @@ Search Results
 <cfparam name="highlightMatches" default="false" type="boolean" />
 
 <!--- default local vars --->
-<cfparam name="thispage" default="1" type="numeric" />
-<cfparam name="endpage" default="1" type="numeric" />
-<cfparam name="startrow" default="1" type="numeric" />
-<cfparam name="endrow" default="1" type="numeric" />
-<cfparam name="qResults.recordCount" default="0" type="numeric" />
 <cfparam name="stQueryStatus" default="#structNew()#" type="struct" />
 <cfparam name="stParam" default="#structNew()#" type="struct" />
 
@@ -41,9 +28,7 @@ Search Results
 <cfset aAllCollections = application.stPlugins.farcryVerity.oVerityConfig.getCollectionArray() />
 
 <!--- inbound parameters defaults --->
-<cfif structKeyExists(form,"criteria2")>
-	<cfset form.criteria=form.criteria2 />
-</cfif>
+
 <cfif structKeyExists(url,"criteria")>
 	<cfset form.criteria = url.criteria />
 </cfif>
@@ -69,6 +54,7 @@ Search Results
 <!--- get serach results --->
 <cfif len(searchCriteria)>
 	<cfsearch collection="#lCollections#" criteria="#searchCriteria#" name="qResults" maxrows="#maxResults#" suggestions="10" status="stQueryStatus" type="internet" />
+
 	<verity:searchlog status="#stQueryStatus#" type="internet" lcollections="#lCollections#" criteria="#searchCriteria#" />
 </cfif>
 
@@ -96,18 +82,47 @@ Search Results
 </style>
 --->
 
-<!--- display search form --->
-<cfinclude template="includes/_searchForm.cfm" />
 
-<!--- eval start/end rows --->
-<cfset startRow = (thisPage * resultsPerPage) - (resultsPerPage - 1) />
-<cfset endPage = ceiling(qResults.recordCount / resultsPerPage) />
-<!--- work out the endrow from the above 2 vars and the recordcount --->
-<cfif thisPage EQ endPage OR endPage EQ 1>
-	<cfset endRow = qResults.recordCount />
-<cfelse>
-	<cfset endRow = startRow + resultsPerPage - 1 />
-</cfif>
+<ft:form>
+
+<!--- display search form --->
+
+<cfoutput>
+	<div id="vp-searchform">
+		<table class="layout">
+		<tr>
+			<td><label for="criteria">You searched for:</label></td>
+			<td><input type="text" name="criteria" id="criteria" value="#form.criteria#" /></td>
+			<td></td>
+		</tr>
+		<tr>
+			<td><label for="searchOperator">Search Operator:</label></td>
+			<td>
+				<select name="searchOperator">
+					<option value="any"<cfif form.searchOperator EQ "any" OR form.searchOperator EQ ""> selected="selected"</cfif>>Any of these words</option>
+				  	<option value="all"<cfif form.searchOperator EQ "all"> selected="selected"</cfif>>All of these words</option>
+				  	<option value="phrase"<cfif form.searchOperator EQ "phrase"> selected="selected"</cfif>>These words as a phrase</option>
+				</select>
+			</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td><label for="advancedOptions">Advanced Options:</label></td>
+			<td>
+				<select name="advancedOptions">
+					<option value="all"<cfif form.advancedOptions EQ "all" OR  form.advancedOptions EQ ""> selected="selected"</cfif>>All Content</option>
+					<cfloop index="i" from="1" to="#arrayLen(aAllCollections)#">
+						<option value="#aAllCollections[i].collectionname#"<cfif form.advancedOptions EQ aAllCollections[i].collectionname> selected="selected"</cfif>>#aAllCollections[i].title#</option>
+					</cfloop>
+				</select>
+			</td>
+			<td><ft:button value="Search" /></td>
+		</tr>
+		</table>
+	</div>
+</cfoutput>
+
+
 
 <cfif isDefined("qResults") AND qResults.recordCount GT 0>
 
@@ -118,50 +133,41 @@ Search Results
 	<cfoutput><p><b>Your search returned <span id="vp-resultsfound">#qResults.recordCount#</span> results.</b></p></cfoutput>
 
 	<!--- display search results --->
-	<cfloop query="qResults" startrow="#startrow#" endrow="#endrow#">
-		<!--- setup stParam to pass verity vars to webskin --->
-		<cfset stParam.searchCriteria = searchCriteria />
-		<cfset stParam.rank = qResults.rank />
-		<cfset stParam.score = qResults.score />
-		<cfset stParam.summary = stripHTML(qResults.summary) />
-		<cfset stParam.title = qResults.title />
-		<cfset stParam.key = qResults.key />
-		<cfif highlightMatches>
-			<cfset stParam.summary = highlightSummary(searchCriteria) />
-		<cfelse>
-			<cfset stParam.summary = stripHTML(qResults.summary) />
-		</cfif>
-		<!--- create object of result type, render webskin --->
-		<cfset oProperty = createObject("component", application.stCoapi[qResults.custom1].packagePath) />
-		<cfset stProperty = oProperty.getData(objectID=qResults.key) />
-		<cfset searchResultHTML = oProperty.getView(stObject=stProperty, stParam=stParam, template="displaySearchResult") />
-		<cfoutput>#searchResultHTML#</cfoutput>
-	</cfloop>
+	
+	<ft:pagination 
+		paginationID="#stobj.objectid#"
+		qRecordSet="#qResults#"
+		pageLinks="5"
+		recordsPerPage="25" 
+		Top="true" 
+		Bottom="true"
+		submissionType="form"
+		renderType="inline"
+		bShowPageDropdown="false"
+		>
 
-	<!--- pagination bottom --->
-	<cfif qResults.recordCount GT resultsPerPage>
-		<cfset urlParameters = "&objectID=#url.objectID#&criteria=#form.criteria#&searchOperator=#form.searchOperator#&advancedOptions=#form.advancedOptions#" />
-		<widgets:paginationDisplay
-			QueryRecordCount="#qResults.recordCount#"
-			DivStyle="vp-pagination"
-			FileName="#cgi.script_name#"
-			MaxresultPages="#maxResultPages#"
-			MaxRowsAllowed="#resultsPerPage#"
-			bEnablePageNumber="true"
-			LayoutNumber="4"
-			FirstLastPage="numeric"
-			Layout_Previous="Previous"
-			Layout_Next="Next"
-			CurrentPageWrapper_Start="<span>"
-			CurrentPageWrapper_End="</span>"
-			ExtraURLString="#urlParameters#"
-			Layout_preNext="<b>"
-			Layout_postNext="</b>"
-			Layout_prePrevious="<b>"
-			Layout_postPrevious="</b>"
-			showCurrentPageDetails=true >
-	</cfif>
+		
+		<!--- Loop through the page to get all the image ID s --->
+		<ft:paginateLoop r_stObject="st" bTypeAdmin="false">		
+			
+			<!--- FORMAT THE SUMMARY --->
+			<cfset st.summary = stripHTML(st.summary) />
+			<cfif highlightMatches>
+				<cfset st.summary = highlightSummary(searchCriteria="#searchCriteria#", summary="#st.summary#") />
+			</cfif>
+			
+			
+			<skin:view typename="#st.custom1#" objectid="#st.key#" webskin="displaySearchResult"
+				searchCriteria="#searchCriteria#"
+				rank="#st.rank#"	
+				score="#st.score#"		
+				title="#st.title#"	
+				key="#st.key#"
+				summary="#st.summary#"		
+				 >
 
+		</ft:paginateLoop>
+	</ft:pagination>
 <cfelse>
 
 	<cfif len(searchCriteria)>
@@ -174,6 +180,10 @@ Search Results
 	</cfif>
 
 </cfif>
+
+</ft:form>
+
+
 
 <cffunction name="formatCriteria" returntype="string" access="private" description="formats search criteria with verity logic" output="false">
 	<cfargument name="criteria" required="true" type="string" />
@@ -246,22 +256,24 @@ Search Results
 		REFindNoCase(" not\Z",suggestedQuery)>
 		<cfset suggestedQuery = replaceList(lCase(suggestedQuery)," and , or , not ", " , , ") />
 	</cfif>
-	<cfset request.inHead.PrototypeLite = 1 />
+	
+	<skin:htmlHead library="extCoreJS">
 
-	<cfset suggestHTML = "<p>Did you mean <a href=""##"" onclick=""$('criteria2').value='#suggestedQuery#';$('searchForm').submit();""><em>#suggestedQuery#</em></a> ?</p>" />
+	<cfset suggestHTML = "<p>Did you mean <a href=""##"" onclick=""$('criteria').value='#suggestedQuery#';$('searchForm').submit();""><em>#suggestedQuery#</em></a> ?</p>" />
 
 	<cfreturn suggestHTML />
 </cffunction>
 
 <cffunction name="highlightSummary" returntype="string" access="private" description="wraps span highlight class around matching terms in summary" output="false">
 	<cfargument name="searchCriteria" required="true" type="string" />
+	<cfargument name="summary" required="true" type="string" />
 
-	<cfset var summaryHightlightHTML = "" />
+	<cfset var summaryHightlightHTML = "#summary#" />
 	<cfset var searchTerms = replaceList(lcase(arguments.searchCriteria)," or , and , not ","|,|,|") />
 
 	<!--- highlight matches --->
 	<cfloop list="#searchTerms#" delimiters="|" index="i">
-		<cfset summaryHightlightHTML = replaceNoCase(summary,i,"<span class='searchhighlight'>#i#</span>", "all") />
+		<cfset summaryHightlightHTML = replaceNoCase(summaryHightlightHTML,i,"<span class='searchhighlight'>#i#</span>", "all") />
 	</cfloop>
 
 	<cfreturn summaryHightlightHTML />
