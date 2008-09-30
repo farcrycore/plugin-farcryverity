@@ -22,16 +22,17 @@
 		</cfif>
 	</cfif>
 
-	<ft:form action="#stparam.actionURL#" name="searchForm">
-		<cfoutput>
-		<table>
-		<tr>
-			<td><input type="text" name="criteria" value="" /> </td>
-			<td><ft:button value="Search" /></td>
-		</tr>
-		</table>
-		</cfoutput>
-	</ft:form>
+	
+	<cfoutput>
+	<div id="search">
+		<form method="post" action="#stparam.actionURL#">
+			<label for="criteria">Site Search:</label>
+			<input id="criteria" type="text" name="criteria"/>
+			<input class="f-submit" type="submit" value="Go"/>
+		</form>
+	</div>
+	</cfoutput>
+	
 </cfif>
 
 <cfsetting enablecfoutputonly="false" />
