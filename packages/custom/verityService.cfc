@@ -58,6 +58,7 @@ $Developer: Geoff Bowers (modius@daemon.com.au) $
 	<cfset var qDeleted=queryNew("objectid") />
 	<cfset var stConfigProps=structNew() />
 	<cfset var oVerityCollection="" />
+	<cfset var baseFilepath="" />
 	
 	<!--- required config values --->
 	<cfif NOT structkeyexists(arguments.config, "lindexproperties") OR NOT len(arguments.config.lindexproperties)>
@@ -95,6 +96,13 @@ $Developer: Geoff Bowers (modius@daemon.com.au) $
 			<cfset lcolumns = listAppend(lColumns, prop) />
 		</cfif>
 	</cfloop>
+	
+	
+	<cfif arguments.config.collectionType EQ "file" AND len(arguments.config.fileproperty)>
+		<cfif NOT listFindNoCase(lColumns, arguments.config.fileproperty)>
+			<cfset lcolumns = listAppend(lColumns, arguments.config.fileproperty) />
+		</cfif>
+	</cfif>
 
 <!--- 	
 	todo: 
@@ -108,9 +116,15 @@ $Developer: Geoff Bowers (modius@daemon.com.au) $
 	SELECT
 		<!--- define custom fields ---> 
 		'#arguments.config.collectiontypename#' AS custom1,
-		'reserved for category' AS custom2,
-		<cfif len(arguments.config.custom3)>#arguments.config.custom3# AS custom3,</cfif>
-		<cfif len(arguments.config.custom4)>#arguments.config.custom4# AS custom4,</cfif>
+		<cfif arguments.config.collectionType EQ "file" AND len(arguments.config.fileproperty)>
+			<!--- CUSTOM2 IS RESERVED IN file --->
+			<cfif len(arguments.config.fileproperty)>objectid<cfelse>''</cfif> AS custom2,
+		<cfelse>
+			'reserved for category' AS custom2,
+		</cfif>		
+		
+		<cfif len(arguments.config.custom3)>#arguments.config.custom3#<cfelse>''</cfif> AS custom3,
+		<cfif len(arguments.config.custom4)>#arguments.config.custom4#<cfelse>''</cfif> AS custom4,
 		<!--- standard columns --->
 		#lcolumns#
 	FROM #arguments.config.collectiontypename#
@@ -135,12 +149,12 @@ $Developer: Geoff Bowers (modius@daemon.com.au) $
 	
 	<!--- determine recently deleted content --->
 	<cfquery name="qDeleted" datasource="#application.dsn#">
-	SELECT objectid
-	FROM fqAudit
+	SELECT object as objectID
+	FROM farLog
 	WHERE 
-		datetimeStamp > #createodbcdatetime(arguments.config.builttodate)#
-		AND auditType = 'delete'
-	ORDER BY datetimeStamp
+		datetimecreated > #createodbcdatetime(arguments.config.builttodate)#
+		AND type = 'delete'
+	ORDER BY datetimecreated
 	</cfquery>
 
 	
@@ -155,57 +169,145 @@ $Developer: Geoff Bowers (modius@daemon.com.au) $
 		<cfset stresult.qUpdates = qDeleted />
 		<cfreturn stresult />
 	</cfif>
-	
-	<!--- update new content items --->
-	<cftry>
-		<cfset stResult.bsuccess="true" />
-		<cfset stResult.message= arguments.config.collectionname & ";  " & qUpdates.recordcount & " record(s) updated." />
-		
-		<cfindex 
-			action="update" 
-			collection="#arguments.config.collectionname#" 
-			query="qUpdates" 
-			key="objectid" 
-			title="#arguments.config.indexTitle#" 
-			body="#arguments.config.lindexproperties#"
-			custom1="custom1"
-			custom2="custom2"
-			custom3="custom3"
-			custom4="custom4"
-			type="custom" />
-		
-		<cfcatch>
-			<cfset stResult.bsuccess="false" />
-			<cfset stResult.message=cfcatch.Message />
-		</cfcatch>
-	</cftry>
 
-	<!--- remove content sent to draft --->
-	<cftry>
-		<cfset stResult.bsuccess="true" />
-		<cfset stResult.message=stResult.message & " " & arguments.config.collectionname & ";  " & qSentToDraft.recordcount & " record(s) removed." />
+	<cfswitch expression="#arguments.config.collectionType#">
+
+		<cfcase value="file">
+			<cftry>
+				<cfset stResult.bsuccess="true" />
+				<cfset stResult.message= arguments.config.collectionname & ";  " & qUpdates.recordcount & " record(s) updated." />
+				
+				<cfif structKeyExists(application.stcoapi[arguments.config.collectionTypename].stprops[arguments.config.fileproperty].metadata, "ftSecure")
+					AND application.types[arguments.config.collectionTypename].stprops[arguments.config.fileproperty].metadata.ftSecure>
+					
+					<cfset baseFilepath = application.path.secureFilePath />
+				<cfelse>
+					<cfset baseFilepath = application.path.defaultFilePath />
+				</cfif>
+						
+				<cfloop query="qUpdates">
+					<cfset fullFilePath = "#baseFilepath##qUpdates[arguments.config.fileproperty][qUpdates.currentRow]#" />
+					<cfif fileExists(fullFilePath)>
+						<cfindex 
+							action="update" 
+							collection="#arguments.config.collectionname#" 
+							key="#fullFilePath#" 
+							custom1="#qUpdates.custom1#"
+							custom2="#qUpdates.custom2#"
+							custom3="#qUpdates.custom3#"
+							custom4="#qUpdates.custom4#"
+							type="file"
+							extensions="*.*"
+							category="file"
+						 	urlpath="#qUpdates.objectid#" >
+					</cfif>
+				</cfloop>
+				
+				<cfcatch>
+					<cfset stResult.bsuccess="false" />
+					<cfset stResult.message=cfcatch.Message />
+				</cfcatch>
+			</cftry>
+			
+		</cfcase>
 		
-		<cfindex action="delete" type="custom" query="qSentToDraft" collection ="#arguments.config.collectionname#" key="objectid" />
+		<cfdefaultcase>
+			<!--- update new content items --->
+			<cftry>
+			<cfset stResult.bsuccess="true" />
+			<cfset stResult.message= arguments.config.collectionname & ";  " & qUpdates.recordcount & " record(s) updated." />
+			
+			<cfindex 
+				action="update" 
+				collection="#arguments.config.collectionname#" 
+				query="qUpdates" 
+				key="objectid" 
+				title="#arguments.config.indexTitle#" 
+				body="#arguments.config.lindexproperties#"
+				custom1="custom1"
+				custom2="custom2"
+				custom3="custom3"
+				custom4="custom4"
+				type="custom"
+				category="custom"   />
+			
+			<cfcatch>
+				<cfset stResult.bsuccess="false" />
+				<cfset stResult.message=cfcatch.Message />
+			</cfcatch>
+			</cftry>
+		</cfdefaultcase>
+	</cfswitch>
+
+	
+
+	<!--- remove content sent to draft --->	
+	<cfif qSentToDraft.recordCount>
+		<cftry>
+			<cfset stResult.bsuccess="true" />
+			<cfset stResult.message=stResult.message & " " & arguments.config.collectionname & ";  " & qSentToDraft.recordcount & " record(s) removed." />
+			
+			<cfswitch expression="#arguments.config.collectionType#">
 		
-		<cfcatch>
-			<cfset stResult.bsuccess="false" />
-			<cfset stResult.message=stResult.message & " " & cfcatch.Message />
-		</cfcatch>
-	</cftry>
+				<cfcase value="file">
+	
+					<cfsearch collection="#arguments.config.collectionname#" criteria="" name="qFileIndexes">
+					<cfquery dbtype="query" name="qSentToDraft">
+					SELECT [key]
+					FROM qFileIndexes
+					WHERE custom2 IN (<cfqueryparam cfsqltype="cf_sql_varchar" list="true" value="#valueList(qSentToDraft.objectid)#">)
+					</cfquery>			
+					
+					<cfindex action="delete" type="custom" query="qSentToDraft" collection ="#arguments.config.collectionname#" key="key" />
+				</cfcase>	
+				
+				<cfdefaultcase>
+					<cfindex action="delete" type="custom" query="qSentToDraft" collection ="#arguments.config.collectionname#" key="objectid" />
+				</cfdefaultcase>
+			</cfswitch>	
+			
+			
+			<cfcatch>
+				<cfset stResult.bsuccess="false" />
+				<cfset stResult.message=stResult.message & " " & cfcatch.Message />
+			</cfcatch>
+		</cftry>
+	</cfif>
 	
 	<!--- remove content deleted --->
-	<cftry>
-		<cfset stResult.bsuccess="true" />
-		<cfset stResult.message=stResult.message & " " & arguments.config.collectionname & ";  " & qDeleted.recordcount & " record(s) deleted." />
+	<cfif qDeleted.recordCount>
+		<cftry>
+			<cfset stResult.bsuccess="true" />
+			<cfset stResult.message=stResult.message & " " & arguments.config.collectionname & ";  " & qDeleted.recordcount & " record(s) deleted." />
+			
+			
+				<cfswitch expression="#arguments.config.collectionType#">
 		
-		<cfindex action="delete" type="custom" query="qDeleted" collection ="#arguments.config.collectionname#" key="objectid" />
-		
-		<cfcatch>
-			<cfset stResult.bsuccess="false" />
-			<cfset stResult.message=stResult.message & " " & cfcatch.Message />
-		</cfcatch>
-	</cftry>
+				<cfcase value="file">
 	
+					<cfsearch collection="#arguments.config.collectionname#" criteria="" name="qFileIndexes">
+					<cfquery dbtype="query" name="qDeleted">
+					SELECT [key]
+					FROM qFileIndexes
+					WHERE custom2 IN (<cfqueryparam cfsqltype="cf_sql_varchar" list="true" value="#valueList(qSentToDraft.objectid)#">)
+					</cfquery>			
+					
+					<cfindex action="delete" type="custom" query="qDeleted" collection ="#arguments.config.collectionname#" key="key" />
+				</cfcase>	
+				
+				<cfdefaultcase>
+					<cfindex action="delete" type="custom" query="qDeleted" collection ="#arguments.config.collectionname#" key="objectid" />
+				</cfdefaultcase>
+			</cfswitch>	
+				
+			
+			
+			<cfcatch>
+				<cfset stResult.bsuccess="false" />
+				<cfset stResult.message=stResult.message & " " & cfcatch.Message />
+			</cfcatch>
+		</cftry>
+	</cfif>
 	<!--- update builttodate if successful --->
 	<cfif stResult.bSuccess AND structkeyexists(arguments.config, "objectid") and qUpdates.recordcount>
 		<cfset oVerityCollection=createobject("component", "farcry.plugins.farcryverity.packages.types.farVerityCollection") />
@@ -297,7 +399,7 @@ Collection Maintenance
 	<cfset stresult.path=variables.path />
 	
 	<cftry>
-		<cfcollection action="create" collection="#arguments.collection#" path="#variables.path#" />
+		<cfcollection action="create" collection="#arguments.collection#" path="#variables.path#" categories="true" />
 		<cfcatch>
 			<cfset stResult.bsuccess="false" />
 			<cfset stResult.message=cfcatch.Message />

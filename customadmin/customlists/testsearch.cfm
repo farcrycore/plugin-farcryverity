@@ -27,6 +27,8 @@
 	##pagination span {text-decoration:none;background:##fff;padding:2px 5px;border: 1px solid ##ccc;color:##ccc}
 	##pagination h4 {float:left;margin:0px;}
 
+
+	.searchhighlight {color:white;background-color:red;}
 </style>
 </cfoutput>
 
@@ -93,6 +95,7 @@
 	</cfdefaultcase>
 </cfswitch>
 <!--- get serach results --->
+
 <cfif len(form.criteria)>
 	<cfsearch collection="#lCollections#"  criteria="#searchCriteria#" name="qResults" maxrows="1000" suggestions="10" status="stQueryStatus" type="internet">
 	<verity:searchlog status="#stQueryStatus#" type="internet" lcollections="#lCollections#" criteria="#searchCriteria#" />
@@ -144,7 +147,7 @@
 	</div>
 </cfoutput>
 
-</ft:form>
+
 
 <!--- work out page counter --->
 <cfif isDefined("url.pg")>
@@ -163,6 +166,7 @@
 <cfif isDefined("qResults") AND qResults.recordCount gt 0>
 	<cfoutput>
 	<h6>Showing #startrow# to #endrow# of <span class="highlight">#qResults.recordCount#</span> results.</h6>
+	
 	<cfif structKeyExists(stQueryStatus, "suggestedquery")>		<cfif 	REFindNoCase(" and ", stQueryStatus.suggestedquery)OR
 			REFindNoCase("\Aand ",stQueryStatus.suggestedquery)OR
 			REFindNoCase(" and\Z",stQueryStatus.suggestedquery)OR
@@ -175,9 +179,9 @@
 			<cfset stQueryStatus.suggestedquery =  replaceList(stQueryStatus.suggestedquery," AND , OR , NOT , and , or , not ", " , , , , , ") />
 		</cfif>
 		<cfset request.inHead.PrototypeLite = 1 />
-		<p>Did you mean: "<a href="##" onclick="$('criteria2').value='#stQueryStatus.suggestedquery#';$('searchForm').submit();">#stQueryStatus.suggestedquery#</a>"?</p>
+		<p>Did you mean: "<a href="##" onclick="$('criteria2').value='#stQueryStatus.suggestedquery#';btnSubmit('#Request.farcryForm.Name#','search');">#stQueryStatus.suggestedquery#</a>"?</p>
 	</cfif>
-	
+
 
 		<cfset urlParameters = "&plugin=farcryverity&module=customlists/testsearch.cfm&criteria=#form.criteria#&searchOperator=#form.searchOperator#">
 		</cfoutput>
@@ -203,58 +207,43 @@
 			        Layout_prePrevious="<strong>"
 			        showCurrentPageDetails=true >
         </cfif>
+
+
+
 	<!--- output results --->
-	<cfoutput>
-		<dl class="search">
-	</cfoutput>
+
 	<cfloop query="qResults" startrow="#startrow#" endrow="#endrow#">
-		<cfif len(qResults.custom1)>
-		<!--- we have a text match --->
-			<cfset oObject = createObject("component", application.stcoapi[qResults.custom1].packagepath)>
-			<cfset stSearchObject = oObject.getData(objectID=qResults.key) />
-			<cfset searchResultHTML = oObject.getView(stobject=stSearchObject, template="displaySearchResult", alternateHTML="")>
-			<cfif len(searchResultHTML)>
-				<cfoutput>#searchResultHTML#</cfoutput>
-			<cfelse>
-				<cfoutput>
-				<dl class="search">
-					<dt></cfoutput><skin:buildLink objectid="#qResults.key#"><cfoutput>#qResults.title#</cfoutput></skin:buildLink><cfoutput></dt></cfoutput>
+		
 
-						<cfoutput><dd class="desc">#qResults.summary# </cfoutput><skin:buildLink objectid="#qResults.key#"><cfoutput>Details</cfoutput></skin:buildLink><cfoutput></dd>
-						<dd class="date">#dateFormat(stSearchObject.datetimelastupdated, "dd mmmm yyyy")#</dd>
-					</dl>
-				</cfoutput>
-			</cfif>
-		<cfelse>
-		<!--- we have a file match --->
-			<cfif len(qResults.key)>
-			<!--- get the file name --->
-				<cfset newfileName = replace(qResults.key, "\", "/", "all")>
-				<cfset fileName = listLast(newfileName, "/")>
-				<!--- now we have to look up the fileName and get the object id of the dmFile --->
-				<cfquery name = "qFile" datasource="#application.dsn#">
-					select distinct(objectid), bMemberRestricted from dmFile where
-					filename = '#fileName#'
-				</cfquery>
-
-				<cfif qFile.recordcount and not qFile.bMemberRestricted>
-					<cfset oFileObject = createObject("component", application.stcoapi.dmFile.packagepath)>
-					<cfset fileHTML = oFileObject.getView(objectid=qFile.objectid, template="displaySearchResult")>
-					<cfoutput>#fileHTML#</cfoutput>
-				<cfelse>
-					<!--- check if file is member only and only show if a member is logged in--->
-					<cfif qFile.recordcount and qFile.bMemberRestricted and session.steelweb.bLoggedIn>
-						<cfset oFileObject = createObject("component", application.stcoapi.dmFile.packagepath)>
-						<cfset fileHTML = oFileObject.getView(objectid=qFile.objectid, template="displaySearchResult")>
-						<cfoutput>#fileHTML#</cfoutput>
-					</cfif>
-				</cfif>
-			</cfif>
-		</cfif>
+		<!--- FORMAT THE SUMMARY --->
+		<cfset formattedSummary = stripHTML(qResults.summary) />
+		<cfset formattedSummary = highlightSummary(searchCriteria="#searchCriteria#", summary="#formattedSummary#") />	
+		
+		<!--- Depending on the type of index that generated the result (custom:Standard,file:File Library,cat:Category Filtered) determines where the object id is located --->
+		<cfswitch expression="#qResults.category#">
+		<cfcase value="file">
+			<cfset searchResultObjectID = qResults.custom2 />
+		</cfcase>
+		<cfdefaultcase>
+			<cfset searchResultObjectID = qResults.key />
+		</cfdefaultcase>
+		</cfswitch>
+				
+		<skin:view 
+			typename="#qResults.custom1#" 
+			objectid="#searchResultObjectID#"
+			webskin="displaySearchResult"
+			searchCriteria="#searchCriteria#"
+			rank="#qResults.rank#"	
+			score="#qResults.score#"		
+			title="#qResults.title#"	
+			key="#qResults.key#"
+			summary="#formattedSummary#"		
+			 >
+			 
+		
 	</cfloop>
-	<cfoutput>
-		</dl>
-	</cfoutput>
+
 	
 	<!--- show previous/next links --->
 		<cfif qResults.recordcount gt ResultsPerPage>
@@ -294,12 +283,110 @@
 			<cfset stQueryStatus.suggestedquery =  replaceList(stQueryStatus.suggestedquery," AND , OR , NOT , and , or , not ", " , , , , , ") />
 		</cfif>
 		<cfset request.inHead.PrototypeLite = 1 />
-		<p>Did you mean: "<a href="##" onclick="$('criteria2').value='#stQueryStatus.suggestedquery#';$('searchForm').submit();">#stQueryStatus.suggestedquery#</a>"?</p>
+		<p>Did you mean: "<a href="##" onclick="$('criteria2').value='#stQueryStatus.suggestedquery#';btnSubmit('#Request.farcryForm.Name#','search');">#stQueryStatus.suggestedquery#</a>"?</p>
 	</cfif>
 
 	</cfoutput>
 
 </cfif>
+</ft:form>
+
+
+<cffunction name="formatCriteria" returntype="string" access="private" description="formats search criteria with verity logic" output="false">
+	<cfargument name="criteria" required="true" type="string" />
+	<cfargument name="searchOperator" required="true" type="string" />
+
+	<cfset var searchCriteria = "" />
+
+	<!--- check for verity reserved words --->
+	<cfif REFindNoCase(" and ", criteria) OR
+		REFindNoCase("\Aand ",criteria) OR
+		REFindNoCase(" and\Z",criteria) OR
+		REFindNoCase(" or ",criteria) OR
+		REFindNoCase("\Aor ",criteria) OR
+		REFindNoCase(" or\Z",criteria) OR
+		REFindNoCase(" not ",criteria) OR
+		REFindNoCase("\Anot ",criteria) OR
+		REFindNoCase(" not\Z",criteria)>
+		<cfset arguments.searchOperator = "custom" />
+	</cfif>
+
+	<!--- treat search criteria with appropriate verity operator --->
+	<cfswitch expression="#searchOperator#">
+		<cfcase value="all">
+			<cfset searchCriteria = replaceNoCase(criteria," "," AND ","all") />
+		</cfcase>
+		<cfcase value="custom">
+			<cfset searchCriteria = criteria />
+		</cfcase>
+		<cfcase value="phrase">
+			<cfset searchCriteria = replaceNoCase(criteria," ","<phrase>","all") />
+		</cfcase>
+		<cfdefaultcase> <!--- treat as ANY --->
+			<cfif NOT findNoCase("not",trim(form.criteria))>
+				<cfset searchCriteria = replaceNoCase(criteria,",","","all") />
+				<cfset searchCriteria = replaceNoCase(criteria," "," OR ","all") />
+			<cfelse>
+				<cfset searchCriteria = criteria />
+			</cfif>
+		</cfdefaultcase>
+	</cfswitch>
+
+	<cfreturn trim(searchCriteria) />
+</cffunction>
+
+<cffunction name="stripHTML" returntype="string" access="private" description="filters out HTML code from summary returned by verity" output="false">
+	<cfargument name="summary" required="true" type="string" />
+
+	<cfset var cleanSummary = "" />
+
+	<cfset cleanSummary = REReplace(trim(arguments.summary), "<.*?>", "", "all") />
+	<cfset cleanSummary = REReplace(cleanSummary, "<.*?$", "", "all") />
+	<cfset cleanSummary = REReplace(cleanSummary, "^.*?>", "", "all") />
+
+	<cfreturn cleanSummary />
+</cffunction>
+
+<cffunction name="suggestLink" returntype="string" access="private" description="filters out HTML code from summary returned by verity" output="false">
+	<cfargument name="suggestedQuery" required="true" type="string" />
+
+	<cfset var suggestHTML = "" />
+
+	<cfif REFindNoCase(" and ", suggestedQuery) OR
+		REFindNoCase("\Aand ",suggestedQuery) OR
+		REFindNoCase(" and\Z",suggestedQuery) OR
+		REFindNoCase(" or ",suggestedQuery) OR
+		REFindNoCase("\Aor ",suggestedQuery) OR
+		REFindNoCase(" or\Z",suggestedQuery) OR
+		REFindNoCase(" not ",suggestedQuery) OR
+		REFindNoCase("\Anot ",suggestedQuery) OR
+		REFindNoCase(" not\Z",suggestedQuery)>
+		<cfset suggestedQuery = replaceList(lCase(suggestedQuery)," and , or , not ", " , , ") />
+	</cfif>
+	
+	<skin:htmlHead library="extCoreJS">
+
+	<cfset suggestHTML = "<p>Did you mean <a href=""##"" onclick=""$('criteria').value='#suggestedQuery#';btnSubmit('#Request.farcryForm.Name#','search');""><em>#suggestedQuery#</em></a> ?</p>" />
+
+	<cfreturn suggestHTML />
+</cffunction>
+
+<cffunction name="highlightSummary" returntype="string" access="private" description="wraps span highlight class around matching terms in summary" output="false">
+	<cfargument name="searchCriteria" required="true" type="string" />
+	<cfargument name="summary" required="true" type="string" />
+
+	<cfset var summaryHightlightHTML = "#summary#" />
+	<cfset var searchTerms = replaceList(lcase(arguments.searchCriteria)," or , and , not ","|,|,|") />
+
+	<!--- highlight matches --->
+	<cfloop list="#searchTerms#" delimiters="|" index="i">
+		<cfset summaryHightlightHTML = replaceNoCase(summaryHightlightHTML,i,"<span class='searchhighlight'>#i#</span>", "all") />
+	</cfloop>
+
+	<cfreturn summaryHightlightHTML />
+</cffunction>
+
+
 
 <!--- setup footer --->
 <admin:footer />

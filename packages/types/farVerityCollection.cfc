@@ -122,8 +122,14 @@ library methods
 	<cfloop collection="#application.types#" item="type">
 		<cfset queryAddRow(qListData) />
 		<cfset querySetCell(qListData, "typename", type) />
-		<cfset querySetCell(qListData, "displayname", application.stcoapi[type].displayname) />
+		<cfset querySetCell(qListData, "displayname", "#application.stcoapi[type].displayname# (#type#)") />
 	</cfloop>
+	
+	<cfquery dbtype="query" name="qListData">
+	SELECT * FROM qListData
+	ORDER BY typename
+	</cfquery>
+	
 	
 	<cfloop query="qListData">
 		<cfset listdata = listAppend(listdata, "#qlistdata.typename#:#qlistdata.displayname#") />
