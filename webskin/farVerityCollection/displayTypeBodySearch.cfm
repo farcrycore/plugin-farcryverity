@@ -150,6 +150,15 @@
 		<!--- Loop through the page to get all the image ID s --->
 		<ft:paginateLoop r_stObject="st" bTypeAdmin="false">		
 			
+			<cfswitch expression="#st.category#">
+			<cfcase value="file">
+				<cfset searchResultObjectID = st.custom2 />
+			</cfcase>
+			<cfdefaultcase>
+				<cfset searchResultObjectID = st.key />
+			</cfdefaultcase>
+			</cfswitch>
+			
 			<!--- FORMAT THE SUMMARY --->
 			<cfset st.summary = stripHTML(st.summary) />
 			<cfif highlightMatches>
@@ -157,7 +166,7 @@
 			</cfif>
 			
 			
-			<skin:view typename="#st.custom1#" objectid="#st.key#" webskin="displaySearchResult"
+			<skin:view typename="#st.custom1#" objectid="#searchResultObjectID#" webskin="displaySearchResult"
 				searchCriteria="#searchCriteria#"
 				rank="#st.rank#"	
 				score="#st.score#"		
