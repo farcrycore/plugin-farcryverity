@@ -7,9 +7,6 @@
 <!--- DEFAULT STPARM --->
 <cfparam name="stparam.actionURL" default="" />
 
-<cfif structKeyExists(url,"criteria")>
-	<cfset form.criteria = url.criteria />
-</cfif>
 
 <!--- ONLY SHOW THE MINI POD IF WE ARE NOT CURRENTLY PERFORMING A SEARCH --->
 <cfif not structKeyExists(form, "criteria")>

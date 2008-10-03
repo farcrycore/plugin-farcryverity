@@ -3,6 +3,17 @@
 <!--- required libs --->
 <cfimport taglib="/farcry/core/tags/webskin" prefix="skin" />
 
+
+<!--- Attributes that should be passed in by the search page --->
+<cfparam name="stParam.searchCriteria" default="" />
+<cfparam name="stParam.rank" default="" />	
+<cfparam name="stParam.score" default="" />	
+<cfparam name="stParam.title" default="" />	
+<cfparam name="stParam.key" default="" />	
+<cfparam name="stParam.summary" default="" />				 
+
+
+
 <!--- determine whether to use teaser or verity summary --->
 <cfif structKeyExists(stObj,"teaser") AND len(trim(stObj.teaser))>
 	<cfset summary = trim(stObj.teaser) />
@@ -10,32 +21,32 @@
 	<cfset summary = trim(stParam.summary) />
 </cfif>
 
+<!--- FORMAT THE SUMMARY --->
+<cfset oVeritySearch = createObject("component", application.stcoapi["farVeritySearch"].packagePath) />
+<cfset summary = oVeritySearch.stripHTML(summary) />
+<cfset summary = oVeritySearch.highlightSummary(searchCriteria="#stParam.searchCriteria#", summary="#summary#") />
+
 <cfoutput>
-	<div id="vp-searchresult">
-		<div class="searchtitle">
-			</cfoutput>
-			<skin:buildlink objectid="#stObj.objectID#">
-				<cfoutput><cfif len(stParam.title)>#stParam.title#<cfelse>#stObj.label#</cfif></cfoutput>
-			</skin:buildlink><cfoutput><br />
-		</div>
-		<div class="searchdate">
-			<cfoutput>#dateFormat(stObj.dateTimeLastUpdated, "d mmmm yyyy")#<br /></cfoutput>
-		</div>
-		<div class="searchsummary">
-			</cfoutput>
-				<cfoutput>#summary# </cfoutput>
-				<cfif right(summary,3) EQ "...">
-					<skin:buildlink objectid="#stObj.objectID#"><cfoutput>  more</cfoutput></skin:buildlink>
-				</cfif>
-			<cfoutput><br />
-		</div>
-		<div class="searchfooter">
-			#application.stCoapi[stobj.typeName].displayName# <span class="searchlight">|</span> </cfoutput>
-			<skin:buildlink objectid="#stObj.objectID#">
-				<cfoutput>Go to page</cfoutput>
-			</skin:buildlink><cfoutput><br />
-		</div>
+<div class="search-result">
+	<div class="search-title">
+		<skin:buildlink objectid="#stObj.objectID#">
+			<cfif len(stParam.title)>#stParam.title#<cfelse>#stObj.label#</cfif>
+		</skin:buildlink>
 	</div>
+	<div class="search-date">
+		#dateFormat(stObj.dateTimeLastUpdated, "d mmmm yyyy")#
+	</div>
+	<div class="search-summary">
+		#summary#
+		<cfif right(summary,3) EQ "...">
+			<skin:buildlink objectid="#stObj.objectID#">more</skin:buildlink>
+		</cfif>
+	</div>
+	<div class="search-footer">
+		#application.stCoapi[stobj.typeName].displayName# |
+		<skin:buildlink objectid="#stObj.objectID#">Go to page</skin:buildlink>
+	</div>
+</div>
 </cfoutput>
 
 <cfsetting enablecfoutputonly="false" />
