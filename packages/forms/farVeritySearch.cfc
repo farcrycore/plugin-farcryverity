@@ -179,7 +179,7 @@
 	
 		<!--- highlight matches --->
 		<cfloop list="#searchTerms#" delimiters="|" index="i">
-			<cfset summaryHightlightHTML = replaceNoCase(summaryHightlightHTML,i,"<span class='searchhighlight'>#i#</span>", "all") />
+			<cfset summaryHightlightHTML = replaceNoCase(summaryHightlightHTML,i,"<span class='search-highlight'>#i#</span>", "all") />
 		</cfloop>
 	
 		<cfreturn summaryHightlightHTML />
