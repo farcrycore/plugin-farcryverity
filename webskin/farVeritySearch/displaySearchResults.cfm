@@ -26,8 +26,11 @@ START WEBSKIN
 	<ft:processFormObjects typename="farVeritySearch" bSessionOnly="true" />
 </ft:processForm>
 
+<!--- Initialize the Search Service --->
+<cfset oSearchService=createobject("component", "farcry.plugins.farcryverity.packages.custom.verityService").init() />
 
-<cfset stSearchResult = getSearchResults(objectid="#stobj.objectid#") />
+
+<cfset stSearchResult = oSearchService.getSearchResults(objectid="#stobj.objectid#") />
 
 <ft:form name="searchForm">
 
@@ -77,7 +80,7 @@ START WEBSKIN
 		<cfelse>
 		
 			<cfoutput><p>Your search for "#stSearchResult.searchCriteria#" produced no results.</p></cfoutput>
-			
+
 			<cfif len(stSearchResult.suggestLink)>
 				<cfoutput><p>Did you mean #stSearchResult.suggestLink#?</p></cfoutput>
 			</cfif>

@@ -7,7 +7,7 @@
 <cfimport taglib="/farcry/core/tags/webskin" prefix="skin" />
 
 
-<skin:view typename="farVeritySearch" key="searchFormPod" webskin="displaySearchPod"  />
+<skin:view typename="farVeritySearch" key="searchForm" webskin="displaySearchPod"  />
 
 
 <cfsetting enablecfoutputonly="false" />

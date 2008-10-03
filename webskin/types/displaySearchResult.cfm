@@ -21,10 +21,12 @@
 	<cfset summary = trim(stParam.summary) />
 </cfif>
 
+<!--- Initialize the Search Service --->
+<cfset oSearchService=createobject("component", "farcry.plugins.farcryverity.packages.custom.verityService").init() />
+
 <!--- FORMAT THE SUMMARY --->
-<cfset oVeritySearch = createObject("component", application.stcoapi["farVeritySearch"].packagePath) />
-<cfset summary = oVeritySearch.stripHTML(summary) />
-<cfset summary = oVeritySearch.highlightSummary(searchCriteria="#stParam.searchCriteria#", summary="#summary#") />
+<cfset summary = oSearchService.stripHTML(summary) />
+<cfset summary = oSearchService.highlightSummary(searchCriteria="#stParam.searchCriteria#", summary="#summary#") />
 
 <cfoutput>
 <div class="search-result">

@@ -8,28 +8,34 @@
 <cfparam name="stparam.actionURL" default="" />
 
 
-<!--- ONLY SHOW THE MINI POD IF WE ARE NOT CURRENTLY PERFORMING A SEARCH --->
-<cfif not structKeyExists(form, "criteria")>
-
-	<cfif not len(stparam.actionURL)>
-		<cfif structKeyExists(application.navid, "search")>
-			<cfset stparam.actionURL = "#application.url.conjurer#?objectID=#application.navID.search#" />
-		<cfelse>
-			<cfset stparam.actionURL = "#application.url.conjurer#?type=farVerityCollection&bodyView=displayTypeSearch" />
-		</cfif>
+<cfif not len(stparam.actionURL)>
+	<cfif structKeyExists(application.navid, "search")>
+		<cfset stparam.actionURL = "#application.url.conjurer#?objectID=#application.navID.search#" />
+	<cfelse>
+		<cfset stparam.actionURL = "#application.url.conjurer#?type=farVerityCollection&bodyView=displayTypeSearchResults" />
 	</cfif>
-
-	
-	<cfoutput>
-	<div id="search">
-		<form method="post" action="#stparam.actionURL#">
-			<label for="criteria">Site Search:</label>
-			<input id="criteria" type="text" name="criteria"/>
-			<input class="f-submit" type="submit" value="Go"/>
-		</form>
-	</div>
-	</cfoutput>
-	
 </cfif>
+
+<ft:form name="searchFormPod" action="#stparam.actionURL#">
+	
+	<!--- We want to clear the value in this search field when displaying and let the search form handle it once submitted --->
+	<cfset stPropMetadata = structNew() />
+	<cfset stPropMetadata.criteria = structNew() />
+	<cfset stPropMetadata.criteria.value = "" />
+	<ft:object objectid="#stobj.objectid#" lFields="criteria,lCollections" stPropMetadata="#stPropMetadata#" r_stFields="stFields" />
+
+	<cfoutput>
+		<div id="search">
+			<table id="tab-search" class="layout">
+			<tr>
+				<td valign="middle">#stFields.criteria.label#</td>
+				<td valign="middle">#stFields.criteria.html#</td>
+				<td valign="middle"><ft:button value="Search" size="small" /></td>
+			</tr>
+			</table>
+		</div>
+	</cfoutput>
+</ft:form>
+
 
 <cfsetting enablecfoutputonly="false" />
