@@ -6,7 +6,7 @@
 <!--- import tag libraries --->
 <cfimport taglib="/farcry/core/tags/webskin" prefix="skin" />
 
-
+<cfoutput><h1>Search</h1></cfoutput>
 <skin:view typename="farVeritySearch" key="searchForm" webskin="displaySearchResults"  />
 
 

@@ -163,7 +163,9 @@
 		
 		<skin:htmlHead library="extCoreJS">
 	
-		<cfset suggestHTML = "<a href=""##"" onclick=""$('searchFormPrefixcriteria').value='#arguments.suggestedQuery#';btnSubmit('searchForm','Search');""><em>#arguments.suggestedQuery#</em></a>" />
+		<cfsavecontent variable="suggestHTML">
+			<cfoutput><a href="##" onclick="$('searchFormPrefixcriteria').value='#htmlEditFormat(arguments.suggestedQuery)#';btnSubmit('searchForm','Search');"><em>#arguments.suggestedQuery#</em></a></cfoutput>
+		</cfsavecontent>
 	
 		<cfreturn suggestHTML />
 	</cffunction>
