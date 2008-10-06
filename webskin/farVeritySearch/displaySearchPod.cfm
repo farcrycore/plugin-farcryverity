@@ -12,7 +12,7 @@
 	<cfif structKeyExists(application.navid, "search")>
 		<cfset stparam.actionURL = "#application.url.conjurer#?objectID=#application.navID.search#" />
 	<cfelse>
-		<cfset stparam.actionURL = "#application.url.conjurer#?type=farVerityCollection&bodyView=displayTypeSearchResults" />
+		<cfset stparam.actionURL = "#application.url.conjurer#?type=farVeritySearch&bodyView=displayTypeBodySearchResults" />
 	</cfif>
 </cfif>
 

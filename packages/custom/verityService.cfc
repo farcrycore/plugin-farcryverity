@@ -477,7 +477,7 @@ Collection Maintenance
 		<cfset stResult.searchCriteria = formatCriteria(criteria=stObject.criteria,searchOperator=stObject.operator) />
 		
 		<!--- SETUP THE RESULTS --->
-		<cfif len(stResult.searchCriteria)>
+		<cfif len(stResult.searchCriteria) AND listLen(stResult.lCollectionsToSearch)>
 		
 			<cfsearch collection="#stResult.lCollectionsToSearch#" criteria="#stResult.searchCriteria#" name="stResult.qResults" maxrows="1000" suggestions="10" status="stResult.stQueryStatus" type="internet" />
 		
