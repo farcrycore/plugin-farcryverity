@@ -511,13 +511,7 @@ Collection Maintenance
 				</cfquery>
 			</cfif>
 
-			
-	 	<!--- reorder results if needed --->
-	<cfif arguments.orderby neq "RANK">
-		<cfquery dbtype="query" name="qResults">
-		SELECT * FROM qResults ORDER BY #arguments.orderby#
-		</cfquery>
-	</cfif>			
+
 		<cfelse>
 			<cfset stResult.qResults = queryNew("init") />
 		</cfif>
