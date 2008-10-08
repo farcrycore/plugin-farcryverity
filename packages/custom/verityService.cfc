@@ -454,11 +454,12 @@ Collection Maintenance
 	<cffunction name="getSearchResults" access="public" output="false" returntype="struct" hint="Returns a structure containing extensive information of the search results">
 		<cfargument name="objectid" required="true" hint="The objectid of the farVeritySearch object containing the details of the search" />
 		<cfargument name="bAllowEmptyCriteria" required="false" default="false" hint="If this is set to true and the criteria is empty, then all indexed results will be returned" />
-		
+		<cfargument name="searchResultFilter" required="false" default="" hint="The function to call to filter the resulting search results.">
+	
 		<cfset var stResult = structNew() />
 		<cfset var qResults = queryNew("init") />
 		<cfset var oSearchForm = createObject("component", application.stcoapi["farVeritySearch"].packagePath) />
-		<cfset var stObject = oSearchForm.getData(objectid="#arguments.objectid#") />
+		<cfset var stSearchForm = oSearchForm.getData(objectid="#arguments.objectid#") />
 		<cfset var lAllCollections = application.stPlugins.farcryVerity.oVerityConfig.getCollectionList() />
 		<cfset var aAllCollections = application.stPlugins.farcryVerity.oVerityConfig.getCollectionArray() />
 		<cfset var lCollectionsToSearch = "" />
@@ -468,14 +469,14 @@ Collection Maintenance
 
 
 		<!--- setup the collections to search on, this may depend on the form value passed in on the search results page --->
-		<cfif not len(stObject.lCollections) OR stObject.lCollections EQ "all">
+		<cfif not len(stSearchForm.lCollections) OR stSearchForm.lCollections EQ "all">
 			<cfset stResult.lCollectionsToSearch = lAllCollections />
 		<cfelse>
-			<cfset stResult.lCollectionsToSearch = stObject.lCollections />
+			<cfset stResult.lCollectionsToSearch = stSearchForm.lCollections />
 		</cfif>
 		
 		<!--- SETUP THE ACTUAL SEARCH CRITERIA --->
-		<cfset stResult.searchCriteria = formatCriteria(criteria=stObject.criteria,searchOperator=stObject.operator) />
+		<cfset stResult.searchCriteria = formatCriteria(criteria=stSearchForm.criteria,searchOperator=stSearchForm.operator) />
 		
 		<!--- SETUP THE RESULTS --->
 		<cfif (len(stResult.searchCriteria) OR arguments.bAllowEmptyCriteria) AND listLen(stResult.lCollectionsToSearch)>
@@ -497,11 +498,11 @@ Collection Maintenance
 			</cfquery>	
 			
 			<!--- Sort the results --->
-			<cfif stObject.orderby neq "RANK">
+			<cfif stSearchForm.orderby neq "RANK">
 				<cfquery dbtype="query" name="stResult.qResults">
 				SELECT *
 				FROM stResult.qResults
-				ORDER BY #stObject.orderby#
+				ORDER BY #stSearchForm.orderby#
 				</cfquery>
 			<cfelse>
 				<cfquery dbtype="query" name="stResult.qResults">
@@ -509,6 +510,13 @@ Collection Maintenance
 				FROM stResult.qResults
 				ORDER BY rank
 				</cfquery>
+			</cfif>
+			
+			<cfif len(arguments.searchResultFilter)>
+				<cfinvoke component="#oSearchForm#" returnvariable="stResult.qResults" method="#arguments.searchResultFilter#">
+					<cfinvokeargument name="objectid" value="#stSearchForm.objectid#" />
+					<cfinvokeargument name="qResults" value="#stResult.qResults#" />
+				</cfinvoke>
 			</cfif>
 
 

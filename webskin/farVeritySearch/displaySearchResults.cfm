@@ -17,6 +17,7 @@ FARCRY IMPORT FILES
 START WEBSKIN
  ------------------>
 <cfparam name="stParam.searchFormWebskin" default="displaySearchForm" /><!--- The webskin used to render the search form. --->
+<cfparam name="stParam.searchResultFilter" default="" /><!--- The farVeritySearch function to pass the results through. --->
 <cfparam name="stParam.bAllowEmptyCriteria" default="false" /><!--- If this is set to true and there is no criteria, then the search returns everything in the index --->
 
 
@@ -32,7 +33,7 @@ START WEBSKIN
 <cfset oSearchService=createobject("component", "farcry.plugins.farcryverity.packages.custom.verityService").init() />
 
 
-<cfset stSearchResult = oSearchService.getSearchResults(objectid="#stobj.objectid#", bAllowEmptyCriteria="#stParam.bAllowEmptyCriteria#") />
+<cfset stSearchResult = oSearchService.getSearchResults(objectid="#stobj.objectid#", bAllowEmptyCriteria="#stParam.bAllowEmptyCriteria#", searchResultFilter="#stParam.searchResultFilter#") />
 
 <ft:form name="searchForm">
 
