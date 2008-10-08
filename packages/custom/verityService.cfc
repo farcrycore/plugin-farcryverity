@@ -453,6 +453,7 @@ Collection Maintenance
 	
 	<cffunction name="getSearchResults" access="public" output="false" returntype="struct" hint="Returns a structure containing extensive information of the search results">
 		<cfargument name="objectid" required="true" hint="The objectid of the farVeritySearch object containing the details of the search" />
+		<cfargument name="bAllowEmptyCriteria" required="false" default="false" hint="If this is set to true and the criteria is empty, then all indexed results will be returned" />
 		
 		<cfset var stResult = structNew() />
 		<cfset var qResults = queryNew("init") />
@@ -477,7 +478,7 @@ Collection Maintenance
 		<cfset stResult.searchCriteria = formatCriteria(criteria=stObject.criteria,searchOperator=stObject.operator) />
 		
 		<!--- SETUP THE RESULTS --->
-		<cfif len(stResult.searchCriteria) AND listLen(stResult.lCollectionsToSearch)>
+		<cfif (len(stResult.searchCriteria) OR arguments.bAllowEmptyCriteria) AND listLen(stResult.lCollectionsToSearch)>
 		
 			<cfsearch collection="#stResult.lCollectionsToSearch#" criteria="#stResult.searchCriteria#" name="stResult.qResults" maxrows="1000" suggestions="10" status="stResult.stQueryStatus" type="internet" />
 		
