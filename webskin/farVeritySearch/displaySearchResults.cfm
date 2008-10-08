@@ -38,7 +38,7 @@ START WEBSKIN
 
 	<skin:view typename="#stobj.typename#" objectid="#stobj.objectid#" webskin="#stParam.searchFormWebskin#" />
 
-	<cfif len(stSearchResult.searchCriteria)>
+	<cfif len(stSearchResult.searchCriteria) OR stParam.bAllowEmptyCriteria>
 
 		<cfif stSearchResult.qResults.recordCount GT 0>
 
