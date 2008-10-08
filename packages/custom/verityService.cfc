@@ -496,11 +496,28 @@ Collection Maintenance
 			WHERE category <> 'file'			
 			</cfquery>	
 			
-			<cfquery dbtype="query" name="stResult.qResults">
-			SELECT *
-			FROM stResult.qResults
-			ORDER BY rank
-			</cfquery>
+			<!--- Sort the results --->
+			<cfif stObject.orderby neq "RANK">
+				<cfquery dbtype="query" name="stResult.qResults">
+				SELECT *
+				FROM stResult.qResults
+				ORDER BY #stObject.orderby#
+				</cfquery>
+			<cfelse>
+				<cfquery dbtype="query" name="stResult.qResults">
+				SELECT *
+				FROM stResult.qResults
+				ORDER BY rank
+				</cfquery>
+			</cfif>
+
+			
+	 	<!--- reorder results if needed --->
+	<cfif arguments.orderby neq "RANK">
+		<cfquery dbtype="query" name="qResults">
+		SELECT * FROM qResults ORDER BY #arguments.orderby#
+		</cfquery>
+	</cfif>			
 		<cfelse>
 			<cfset stResult.qResults = queryNew("init") />
 		</cfif>
