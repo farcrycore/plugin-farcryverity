@@ -16,6 +16,7 @@ FARCRY IMPORT FILES
 <!------------------ 
 START WEBSKIN
  ------------------>
+<cfparam name="stParam.searchFormWebskin" default="displaySearchForm" />
 
 
 <!--- default local vars --->
@@ -34,7 +35,7 @@ START WEBSKIN
 
 <ft:form name="searchForm">
 
-	<skin:view typename="#stobj.typename#" objectid="#stobj.objectid#" webskin="displaySearchForm" />
+	<skin:view typename="#stobj.typename#" objectid="#stobj.objectid#" webskin="#stParam.searchFormWebskin#" />
 
 	<cfif len(stSearchResult.searchCriteria)>
 
