@@ -6,8 +6,13 @@
 <!--- import tag libraries --->
 <cfimport taglib="/farcry/core/tags/webskin" prefix="skin" />
 
-<cfoutput><h1>Search</h1></cfoutput>
-<skin:view typename="farVeritySearch" key="searchForm" webskin="displaySearchResults" searchFormWebskin="displaySearchForm" bAllowEmptyCriteria="false" />
+<cfif isDefined("request.stObj.title")>
+	<cfoutput><h1>#request.stObj.title#</h1></cfoutput>
+<cfelse>
+	<cfoutput><h1>Search</h1></cfoutput>
+</cfif>
+
+<skin:view typename="#stobj.name#" key="#stobj.name#SearchForm" webskin="displaySearch" />
 
 
 <cfsetting enablecfoutputonly="false" />

@@ -4,38 +4,25 @@
 <cfimport taglib="/farcry/core/tags/formtools" prefix="ft" />
 
 
-<!--- DEFAULT STPARM --->
-<cfparam name="stparam.actionURL" default="" />
 
+<!--- We want to clear the value in this search field when displaying and let the search form handle it once submitted --->
+<cfset stPropMetadata = structNew() />
+<cfset stPropMetadata.criteria = structNew() />
+<cfset stPropMetadata.criteria.value = "" />
+<ft:object objectid="#stobj.objectid#" lFields="criteria" stPropMetadata="#stPropMetadata#" r_stFields="stFields" />
 
-<cfif not len(stparam.actionURL)>
-	<cfif structKeyExists(application.navid, "search")>
-		<cfset stparam.actionURL = "#application.url.conjurer#?objectID=#application.navID.search#" />
-	<cfelse>
-		<cfset stparam.actionURL = "#application.url.conjurer#?type=farVeritySearch&bodyView=displayTypeBodySearchResults" />
-	</cfif>
-</cfif>
+<cfoutput>
+	<div id="search">
+		<table id="tab-search" class="layout">
+		<tr>
+			<td valign="middle">#stFields.criteria.label#</td>
+			<td valign="middle">#stFields.criteria.html#</td>
+			<td valign="middle"><ft:button value="Search" size="small" /></td>
+		</tr>
+		</table>
+	</div>
+</cfoutput>
 
-<ft:form name="searchFormPod" action="#stparam.actionURL#">
-	
-	<!--- We want to clear the value in this search field when displaying and let the search form handle it once submitted --->
-	<cfset stPropMetadata = structNew() />
-	<cfset stPropMetadata.criteria = structNew() />
-	<cfset stPropMetadata.criteria.value = "search" />
-	<ft:object objectid="#stobj.objectid#" lFields="criteria,lCollections" stPropMetadata="#stPropMetadata#" r_stFields="stFields" />
-
-	<cfoutput>
-		<div id="search">
-			<table id="tab-search" class="layout">
-			<tr>
-				<!--<td valign="middle">#stFields.criteria.label#</td>-->
-				<td valign="middle">#stFields.criteria.html#</td>
-				<td valign="middle"><ft:button value="GO &gt;" size="small" sprite="shim.gif" id="menusearch-btn" /></td>
-			</tr>
-			</table>
-		</div>
-	</cfoutput>
-</ft:form>
 
 
 <cfsetting enablecfoutputonly="false" />

@@ -5,9 +5,21 @@
 
 <!--- import tag libraries --->
 <cfimport taglib="/farcry/core/tags/webskin" prefix="skin" />
+<cfimport taglib="/farcry/core/tags/formtools" prefix="ft" />
 
 
-<skin:view typename="farVeritySearch" key="searchForm" webskin="displaySearchPod"  />
 
+<cfif structKeyExists(application.navid, "search")>
+	<cfset actionURL = "#application.url.conjurer#?objectID=#application.navID.search#" />
+<cfelse>
+	<cfset actionURL = "#application.url.conjurer#?type=#stobj.name#&bodyView=displayTypeBodySearch" />
+</cfif>
+
+
+<ft:form action="#actionURL#">
+
+	<skin:view typename="#stobj.name#" key="#stobj.name#SearchForm" webskin="displaySearchPod"  />
+
+</ft:form>
 
 <cfsetting enablecfoutputonly="false" />

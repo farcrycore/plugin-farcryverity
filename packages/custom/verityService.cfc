@@ -453,12 +453,13 @@ Collection Maintenance
 	
 	<cffunction name="getSearchResults" access="public" output="false" returntype="struct" hint="Returns a structure containing extensive information of the search results">
 		<cfargument name="objectid" required="true" hint="The objectid of the farVeritySearch object containing the details of the search" />
-		<cfargument name="bAllowEmptyCriteria" required="false" default="false" hint="If this is set to true and the criteria is empty, then all indexed results will be returned" />
-		<cfargument name="searchResultFilter" required="false" default="" hint="The function to call to filter the resulting search results.">
-	
+		<cfargument name="typename" required="false" default="farVeritySearch" hint="The verity search form type used to control the search.">
+		<cfargument name="maxrows" required="false" default="1000" hint="The maximum results we want returned from the verity search">
+		<cfargument name="suggestions" required="false" default="10" hint="The maximum alternate search string suggestions we want returned from the verity search.">
+		
 		<cfset var stResult = structNew() />
 		<cfset var qResults = queryNew("init") />
-		<cfset var oSearchForm = createObject("component", application.stcoapi["farVeritySearch"].packagePath) />
+		<cfset var oSearchForm = createObject("component", application.stcoapi["#arguments.typename#"].packagePath) />
 		<cfset var stSearchForm = oSearchForm.getData(objectid="#arguments.objectid#") />
 		<cfset var lAllCollections = application.stPlugins.farcryVerity.oVerityConfig.getCollectionList() />
 		<cfset var aAllCollections = application.stPlugins.farcryVerity.oVerityConfig.getCollectionArray() />
@@ -479,9 +480,9 @@ Collection Maintenance
 		<cfset stResult.searchCriteria = formatCriteria(criteria=stSearchForm.criteria,searchOperator=stSearchForm.operator) />
 		
 		<!--- SETUP THE RESULTS --->
-		<cfif (len(stResult.searchCriteria) OR arguments.bAllowEmptyCriteria) AND listLen(stResult.lCollectionsToSearch)>
+		<cfif len(stResult.searchCriteria) AND listLen(stResult.lCollectionsToSearch)>
 		
-			<cfsearch collection="#stResult.lCollectionsToSearch#" criteria="#stResult.searchCriteria#" name="stResult.qResults" maxrows="1000" suggestions="10" status="stResult.stQueryStatus" type="internet" />
+			<cfsearch collection="#stResult.lCollectionsToSearch#" criteria="#stResult.searchCriteria#" name="stResult.qResults" maxrows="#arguments.maxrows#" suggestions="#arguments.suggestions#" status="stResult.stQueryStatus" type="internet" />
 		
 			<verity:searchlog status="#stResult.stQueryStatus#" type="internet" lcollections="#lCollectionsToSearch#" criteria="#stResult.searchCriteria#" />
 			
@@ -512,12 +513,11 @@ Collection Maintenance
 				</cfquery>
 			</cfif>
 			
-			<cfif len(arguments.searchResultFilter)>
-				<cfinvoke component="#oSearchForm#" returnvariable="stResult.qResults" method="#arguments.searchResultFilter#">
-					<cfinvokeargument name="objectid" value="#stSearchForm.objectid#" />
-					<cfinvokeargument name="qResults" value="#stResult.qResults#" />
-				</cfinvoke>
-			</cfif>
+			
+			<cfinvoke component="#oSearchForm#" returnvariable="stResult.qResults" method="filterResults">
+				<cfinvokeargument name="objectid" value="#stSearchForm.objectid#" />
+				<cfinvokeargument name="qResults" value="#stResult.qResults#" />
+			</cfinvoke>
 
 
 		<cfelse>
@@ -617,8 +617,8 @@ Collection Maintenance
 		<skin:htmlHead library="extCoreJS">
 	
 		<cfsavecontent variable="suggestHTML">
-			<cfoutput><a href="##" onclick="$('searchFormPrefixcriteria').value='#htmlEditFormat(arguments.suggestedQuery)#';btnSubmit('searchForm','Search');"><em>#arguments.suggestedQuery#</em></a></cfoutput>
-		</cfsavecontent>
+			<cfoutput><a href="##" onclick="f=Ext.query('###request.farcryForm.name# .verity-search-criteria');for(var i=0; i<f.length; i++){f[i].value='#htmlEditFormat(arguments.suggestedQuery)#';};btnSubmit('#request.farcryForm.name#','Search');"><em>#arguments.suggestedQuery#</em></a></cfoutput>
+		</cfsavecontent>		
 	
 		<cfreturn suggestHTML />
 	</cffunction>
