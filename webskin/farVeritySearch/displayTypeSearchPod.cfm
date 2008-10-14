@@ -9,17 +9,7 @@
 
 
 
-<cfif structKeyExists(application.navid, "search")>
-	<cfset actionURL = "#application.url.conjurer#?objectID=#application.navID.search#" />
-<cfelse>
-	<cfset actionURL = "#application.url.conjurer#?type=#stobj.name#&bodyView=displayTypeBodySearch" />
-</cfif>
+<skin:view typename="#stobj.name#" key="SearchForm" webskin="displaySearchPod"  />
 
-
-<ft:form action="#actionURL#">
-
-	<skin:view typename="#stobj.name#" key="#stobj.name#SearchForm" webskin="displaySearchPod"  />
-
-</ft:form>
 
 <cfsetting enablecfoutputonly="false" />

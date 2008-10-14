@@ -12,7 +12,7 @@
 	<cfoutput><h1>Search</h1></cfoutput>
 </cfif>
 
-<skin:view typename="#stobj.name#" key="#stobj.name#SearchForm" webskin="displaySearch" />
+<skin:view typename="#stobj.name#" key="SearchForm" webskin="displaySearch" />
 
 
 <cfsetting enablecfoutputonly="false" />
