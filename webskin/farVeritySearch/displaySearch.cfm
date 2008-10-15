@@ -28,7 +28,7 @@ START WEBSKIN
 
 
 <!--- Render the search form and results --->
-<ft:form>
+<ft:form name="#stobj.typename#SearchForm" bAjaxSubmission="true" ajaxMaskMsg="Searching..." action="#application.url.webroot#/index.cfm?objectid=#stobj.objectid#&view=displaySearch">
 
 	<!--- Get the search Results --->
 	<cfset oSearchService=createobject("component", "farcry.plugins.farcryverity.packages.custom.verityService").init() />
@@ -43,7 +43,7 @@ START WEBSKIN
 		<skin:view typename="#stobj.typename#" objectid="#stobj.objectid#" webskin="displaySearchSuggestions" stParam="#stSearchResult#" />
 
 		<cfif stSearchResult.qResults.recordCount GT 0>
-			<skin:view typename="#stobj.typename#" objectid="#stobj.objectid#" webskin="displaySearchResultss" stParam="#stSearchResult#" />
+			<skin:view typename="#stobj.typename#" objectid="#stobj.objectid#" webskin="displaySearchResults" stParam="#stSearchResult#" />
 		</cfif>
 	<cfelse>
 		<skin:view typename="#stobj.typename#" objectid="#stobj.objectid#" webskin="displaySearchNoCriteria" stParam="#stSearchResult#" />

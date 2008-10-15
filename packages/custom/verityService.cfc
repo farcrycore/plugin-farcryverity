@@ -617,7 +617,7 @@ Collection Maintenance
 		<skin:htmlHead library="extCoreJS">
 	
 		<cfsavecontent variable="suggestHTML">
-			<cfoutput><a href="##" onclick="f=Ext.query('###request.farcryForm.name# .verity-search-criteria');for(var i=0; i<f.length; i++){f[i].value='#htmlEditFormat(arguments.suggestedQuery)#';};btnSubmit('#request.farcryForm.name#','Search');"><em>#arguments.suggestedQuery#</em></a></cfoutput>
+			<cfoutput><a href="##" onclick="btnClick('#Request.farcryForm.Name#','Search');f=Ext.query('###request.farcryForm.name# .verity-search-criteria');for(var i=0; i<f.length; i++){f[i].value='#htmlEditFormat(arguments.suggestedQuery)#';};#request.farcryForm.onSubmit#;btnSubmit('#request.farcryForm.name#','Search');"><em>#arguments.suggestedQuery#</em></a></cfoutput>
 		</cfsavecontent>		
 	
 		<cfreturn suggestHTML />
