@@ -112,6 +112,7 @@ $Developer: Geoff Bowers (modius@daemon.com.au) $
 	 - add dbowner requirements
 --->
 	<!--- determine recently updated content items --->
+
 	<cfquery name="qUpdates" datasource="#application.dsn#" maxrows="#variables.chunksize#">
 	SELECT
 		<!--- define custom fields ---> 
@@ -134,6 +135,22 @@ $Developer: Geoff Bowers (modius@daemon.com.au) $
 	</cfif>
 	ORDER BY datetimelastupdated
 	</cfquery>
+	
+	<cfif listlen(arguments.config.CATCOLLECTION)>
+		<cfset oCat = createObject("component", "farcry.core.packages.types.category") />
+		<cfset qCat = oCat.getDataQuery(lCategoryIDs="#arguments.config.CATCOLLECTION#"
+			,typename="#arguments.config.collectiontypename#"
+			,bMatchAll="0"
+			) />
+			
+		<cfif qCat.recordCount>
+			<cfquery dbtype="query" name="qUpdates">
+			SELECT * FROM qUpdates
+			WHERE objectID IN (<cfqueryparam cfsqltype="cf_sql_varchar" value="#valueList(qCat.objectid)#" list="true">)
+			</cfquery>
+		</cfif>
+		
+	</cfif>
 	
 	<!--- determine content items recently sent to draft --->
 	<cfif structkeyexists(application.stcoapi[arguments.config.collectiontypename].stprops, "status")>
