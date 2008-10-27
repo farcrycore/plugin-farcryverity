@@ -22,10 +22,9 @@ START WEBSKIN
 <cfparam name="stQueryStatus" default="#structNew()#" type="struct" />
 
 <!--- inbound parameters defaults --->
-<ft:processForm action="Search" url="refresh">
+<ft:processForm action="Search">
 	<ft:processFormObjects objectid="#stobj.objectid#" typename="#stobj.typename#" bSessionOnly="true" />
 </ft:processForm>
-
 
 <!--- Render the search form and results --->
 <ft:form name="#stobj.typename#SearchForm" bAjaxSubmission="true" ajaxMaskMsg="Searching..." action="#application.url.webroot#/index.cfm?objectid=#stobj.objectid#&view=displaySearch">
