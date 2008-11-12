@@ -50,8 +50,17 @@
 	</cffunction>
 
 	<cffunction name="setCollectionList" access="public" output="false" returntype="void">
-		<cfset var qCollections=getCollections() />
-		<cfset variables.lCollections = valuelist(qCollections.collectionname) />
+		<cfargument name="lCollections" default="" required="false" hint="A list of collection names to manually set the collection list. If none sent, getCollections() will be used to populate the list.">
+		
+		<cfset var stVar = structNew() />
+		
+		<cfif len(arguments.lCollections)>
+			<cfset variables.lCollections = arguments.lCollections />
+		<cfelse>
+			<cfset stVar.qCollections = getCollections() />
+			<cfset variables.lCollections = valuelist(stVar.qCollections.collectionname) />
+		</cfif>		
+		
 		<cfreturn />
 	</cffunction>
 
