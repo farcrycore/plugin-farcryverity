@@ -69,7 +69,7 @@ VIEW
 	typename="farVerityCollection"
 	permissionset="news"
 	title="Verity Collections"
-	columnList="title,collectiontypename,hostname,builttodate,lIndexProperties,benablesearch,collectiontype"
+	columnList="title,collectionName,hostname,builttodate,lIndexProperties,benablesearch,collectiontype"
 	aCustomColumns="#aCustomColumns#"
 	sortableColumns="title,collectiontypename,builttodate"
 	lFilterFields="title"

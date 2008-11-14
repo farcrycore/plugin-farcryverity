@@ -59,6 +59,7 @@ $Developer: Geoff Bowers (modius@daemon.com.au) $
 	<cfset var stConfigProps=structNew() />
 	<cfset var oVerityCollection="" />
 	<cfset var baseFilepath="" />
+	<cfset var oType="" />
 	
 	<!--- required config values --->
 	<cfif NOT structkeyexists(arguments.config, "lindexproperties") OR NOT len(arguments.config.lindexproperties)>
@@ -111,30 +112,54 @@ $Developer: Geoff Bowers (modius@daemon.com.au) $
 	 - move verity actions to private methods
 	 - add dbowner requirements
 --->
+	
+	<!--- ALLOW THE DEVELOPER TO CREATE A CUSTOM QUERY FOR THE CONTENT THEY WANT TO INDEX --->
+	<cfset oType = createObject("component", application.stcoapi["#arguments.config.collectiontypename#"].packagePath) />
+	<cfif structKeyExists(oType,"verityObjectsToUpdate")>
+		<cfinvoke component="#oType#" method="verityObjectsToUpdate" returnvariable="qUpdates">
+			<cfinvokeargument name="verityConfig" value="#arguments.config#">
+		</cfinvoke>
+	<cfelse>
+		<cfquery name="qUpdates" datasource="#application.dsn#" maxrows="#variables.chunksize#">
+		SELECT objectID
+		FROM #arguments.config.collectiontypename#
+		WHERE datetimelastupdated > #createodbcdatetime(arguments.config.builttodate)#
+		</cfquery>
+	</cfif>
+	
 	<!--- determine recently updated content items --->
+	<cfquery datasource="#application.dsn#" name="qAllContent">
+	SELECT 	objectid,
+			#lcolumns#,
+			<!--- define custom fields ---> 
+			'#arguments.config.collectiontypename#' AS custom1,
+			<cfif arguments.config.collectionType EQ "file" AND len(arguments.config.fileproperty)>
+				<!--- CUSTOM2 IS RESERVED IN file --->
+				<cfif len(arguments.config.fileproperty)>objectid<cfelse>''</cfif> AS custom2,
+			<cfelse>
+				'reserved for category' AS custom2,
+			</cfif>		
+			
+			<cfif len(arguments.config.custom3)>#arguments.config.custom3#<cfelse>''</cfif> AS custom3,
+			<cfif len(arguments.config.custom4)>#arguments.config.custom4#<cfelse>''</cfif> AS custom4,
+			<!--- standard columns --->			
+			datetimelastupdated
 
-	<cfquery name="qUpdates" datasource="#application.dsn#" maxrows="#variables.chunksize#">
-	SELECT
-		<!--- define custom fields ---> 
-		'#arguments.config.collectiontypename#' AS custom1,
-		<cfif arguments.config.collectionType EQ "file" AND len(arguments.config.fileproperty)>
-			<!--- CUSTOM2 IS RESERVED IN file --->
-			<cfif len(arguments.config.fileproperty)>objectid<cfelse>''</cfif> AS custom2,
-		<cfelse>
-			'reserved for category' AS custom2,
-		</cfif>		
-		
-		<cfif len(arguments.config.custom3)>#arguments.config.custom3#<cfelse>''</cfif> AS custom3,
-		<cfif len(arguments.config.custom4)>#arguments.config.custom4#<cfelse>''</cfif> AS custom4,
-		<!--- standard columns --->
-		#lcolumns#
 	FROM #arguments.config.collectiontypename#
 	WHERE datetimelastupdated > #createodbcdatetime(arguments.config.builttodate)#
 	<cfif structkeyexists(application.stcoapi[arguments.config.collectiontypename].stprops, "status")>
 		AND status = 'approved'
 	</cfif>
-	ORDER BY datetimelastupdated
 	</cfquery>
+	
+	<!--- JOIN CUSTOM QUERY AND THE COLUMNS DEFINED BY THE CONFIG --->
+	<cfquery name="qUpdates" dbType="query" maxrows="#variables.chunksize#">
+	SELECT qAllContent.*
+	FROM qUpdates, qAllContent
+	WHERE qUpdates.objectid = qAllContent.objectid
+	ORDER BY qAllContent.datetimelastupdated
+	</cfquery>
+	
 	
 	<cfif listlen(arguments.config.CATCOLLECTION)>
 		<cfset oCat = createObject("component", "farcry.core.packages.types.category") />
@@ -145,8 +170,10 @@ $Developer: Geoff Bowers (modius@daemon.com.au) $
 			
 		<cfif qCat.recordCount>
 			<cfquery dbtype="query" name="qUpdates">
-			SELECT * FROM qUpdates
-			WHERE objectID IN (<cfqueryparam cfsqltype="cf_sql_varchar" value="#valueList(qCat.objectid)#" list="true">)
+			SELECT qUpdates.*
+			FROM qUpdates, qAllContent
+			WHERE qUpdates.objectid = qCat.objectid
+			ORDER BY qUpdates.datetimelastupdated
 			</cfquery>
 		</cfif>
 		
