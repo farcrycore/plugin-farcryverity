@@ -71,7 +71,8 @@
 		SELECT objectid AS configid, title, collectionname
 		FROM farVerityCollection
 		WHERE bEnableSearch = 1
-		AND hostname = '#variables.hostname#'
+		AND hostname = <cfqueryparam cfsqltype="cf_sql_varchar" value="#variables.hostname#" />
+		AND collectionname LIKE <cfqueryparam cfsqltype="cf_sql_varchar" value="#application.ApplicationName#/_%" /> escape '/'
 		ORDER BY title
 		</cfquery>
 		

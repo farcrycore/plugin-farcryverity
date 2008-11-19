@@ -29,6 +29,7 @@ type properties
 <cfproperty ftseq="42" ftfieldset="Advanced Options" name="custom4" type="string" hint="Custom4 field hijack for a single string/longchar property; for example, lauthors." required="no" default="" fttype="list" ftlistdata="getIndexMisc" ftlabel="Miscellaneous Filter" />
 <cfproperty ftseq="43" ftfieldset="Advanced Options" name="fileproperty" type="string" hint="Associated file collection will be based on this filepath property if activated." required="no" default="" fttype="list" ftlistdata="getIndexFilePaths" ftlabel="File Collection" />
 <cfproperty ftseq="44" ftfieldset="Advanced Options" name="catCollection" type="string" hint="Category filter for collection." required="no" default="" fttype="category" ftalias="root" ftlabel="Category Filter" />
+<cfproperty ftseq="45" ftfieldset="Advanced Options" name="contentToIndexFunction" type="string" hint="Name of the function used to return the objects to be indexed by this collection" required="no" default="contentToIndex" fttype="list" ftListData="getContentToIndexFunctionList" ftlabel="Content to Index Function" />
 
 <cfproperty ftseq="61" ftfieldset="Operational" name="builttodate" type="date" hint="The date the collection was last built to.  Can be manually overridden to force collection to update from the specified point, based on typename datetimelastupdated." required="yes" default="{ts '1970-01-01 00:00:00'}" fttype="datetime" ftlabel="Built To date" />
 <cfproperty ftseq="62" ftfieldset="Operational" name="bEnableSearch" type="boolean" hint="Enable search; by default new collections start as disabled." required="no" default="" ftlabel="Enable Search?" />
@@ -73,6 +74,33 @@ afterSave(); synch with other host collections
 	<cfset resetActiveCollections() />
 	
 	<cfreturn stReturn>
+</cffunction>
+
+
+<cffunction name="getContentToIndexFunctionList" access="public" hint="Returns a list of functions that are available to provide queries of objects for search services to index" returntype="string" output="false">
+	<cfargument name="objectid" required="yes" type="UUID" hint="Object ID of the object being deleted">
+
+	<cfset var stobj=getData(objectid=arguments.objectid) />
+	<cfset var result = "" />
+	<cfset var o = "" />
+	<cfset var f = "" />
+	
+	
+	<cfif len(stobj.collectiontypename)>
+		<cfset o = createObject("component", application.stcoapi["#stobj.collectiontypename#"].packagePath) />
+		<!--- ADD DEFAULT FIRST GETTING THE DISPLAY NAME --->
+		<cfif structKeyExists(o, "contentToIndex")>
+			<cfset result = listAppend(result, "contentToIndex:#o['contentToIndex'].metadata.displayName#") />
+		</cfif>
+		<!--- ADD OTHER OPTIONS --->
+		<cfloop collection="#o#" item="f">
+			<cfif left(f,14) EQ "contentToIndex" AND f NEQ "contentToIndex">
+				<cfset result = listAppend(result, "#f#:#o[f].metadata.displayName#") />
+			</cfif>
+		</cfloop>
+	</cfif>
+	
+	<cfreturn result>
 </cffunction>
 
 <cffunction name="resetActiveCollections" access="public" output="false" returntype="void" hint="Reset the active collection list for this host.">

@@ -93,6 +93,10 @@ VIEW:
 		</cfcase>
 	</cfswitch>
 
+	<cfif listLen(getContentToIndexFunctionList(objectid="#stobj.objectid#")) GT 1>
+		<ft:object legend="Content To Index" lfields="contentToIndexFunction" stobject="#stObj#" format="edit" intable="false" />
+	</cfif>
+	
 	<ft:object legend="Advanced Configuration" lfields="custom3,custom4" stobject="#stObj#" format="edit" intable="false" />
 	<ft:object legend="Operational Options" lfields="bEnableSearch,builttodate,collectionname,collectionpath,hostname" stobject="#stObj#" format="edit" intable="false" />
 	<ft:object legend="Debug Options Only" lfields="collectiontype,collectiontypename" stobject="#stObj#" format="edit" intable="false" />

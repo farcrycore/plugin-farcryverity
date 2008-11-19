@@ -115,18 +115,18 @@ $Developer: Geoff Bowers (modius@daemon.com.au) $
 	
 	<!--- ALLOW THE DEVELOPER TO CREATE A CUSTOM QUERY FOR THE CONTENT THEY WANT TO INDEX --->
 	<cfset oType = createObject("component", application.stcoapi["#arguments.config.collectiontypename#"].packagePath) />
-	<cfif structKeyExists(oType,"verityObjectsToUpdate")>
-		<cfinvoke component="#oType#" method="verityObjectsToUpdate" returnvariable="qUpdates">
-			<cfinvokeargument name="verityConfig" value="#arguments.config#">
+	<cfif structKeyExists(oType,"#arguments.config.contentToIndexFunction#")>
+		<cfinvoke component="#oType#" method="#arguments.config.contentToIndexFunction#" returnvariable="qUpdates">
+			<cfinvokeargument name="config" value="#arguments.config#">
 		</cfinvoke>
 	<cfelse>
-		<cfquery name="qUpdates" datasource="#application.dsn#" maxrows="#variables.chunksize#">
+		<!--- OTHERWISE GET ALL CONTENT --->
+		<cfquery name="qUpdates" datasource="#application.dsn#">
 		SELECT objectID
 		FROM #arguments.config.collectiontypename#
-		WHERE datetimelastupdated > #createodbcdatetime(arguments.config.builttodate)#
 		</cfquery>
 	</cfif>
-	
+
 	<!--- determine recently updated content items --->
 	<cfquery datasource="#application.dsn#" name="qAllContent">
 	SELECT 	objectid,
@@ -159,8 +159,7 @@ $Developer: Geoff Bowers (modius@daemon.com.au) $
 	WHERE qUpdates.objectid = qAllContent.objectid
 	ORDER BY qAllContent.datetimelastupdated
 	</cfquery>
-	
-	
+
 	<cfif listlen(arguments.config.CATCOLLECTION)>
 		<cfset oCat = createObject("component", "farcry.core.packages.types.category") />
 		<cfset qCat = oCat.getDataQuery(lCategoryIDs="#arguments.config.CATCOLLECTION#"
@@ -171,7 +170,7 @@ $Developer: Geoff Bowers (modius@daemon.com.au) $
 		<cfif qCat.recordCount>
 			<cfquery dbtype="query" name="qUpdates">
 			SELECT qUpdates.*
-			FROM qUpdates, qAllContent
+			FROM qUpdates, qCat
 			WHERE qUpdates.objectid = qCat.objectid
 			ORDER BY qUpdates.datetimelastupdated
 			</cfquery>
@@ -447,6 +446,7 @@ Collection Maintenance
 		<cfcatch>
 			<cfset stResult.bsuccess="false" />
 			<cfset stResult.message=cfcatch.Message />
+			<cfabort showerror="debugging" />
 		</cfcatch>
 	</cftry>
 	
@@ -519,7 +519,7 @@ Collection Maintenance
 		<cfelse>
 			<cfset stResult.lCollectionsToSearch = stSearchForm.lCollections />
 		</cfif>
-		
+	
 		<!--- SETUP THE ACTUAL SEARCH CRITERIA --->
 		<cfset stResult.searchCriteria = formatCriteria(criteria=stSearchForm.criteria,searchOperator=stSearchForm.operator) />
 		
@@ -681,6 +681,5 @@ Collection Maintenance
 	
 		<cfreturn summaryHightlightHTML />
 	</cffunction>
-	
 	
 </cfcomponent>
