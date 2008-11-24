@@ -528,7 +528,7 @@ Collection Maintenance
 		
 			<cfsearch collection="#stResult.lCollectionsToSearch#" criteria="#stResult.searchCriteria#" name="stResult.qResults" maxrows="#arguments.maxrows#" suggestions="#arguments.suggestions#" status="stResult.stQueryStatus" type="internet" />
 		
-			<verity:searchlog status="#stResult.stQueryStatus#" type="internet" lcollections="#lCollectionsToSearch#" criteria="#stResult.searchCriteria#" />
+			<verity:searchLog status="#stResult.stQueryStatus#" type="internet" lcollections="#lCollectionsToSearch#" criteria="#stResult.searchCriteria#" />
 			
 			<cfquery dbtype="query" name="stResult.qResults">
 			SELECT *, custom2 AS objectid
