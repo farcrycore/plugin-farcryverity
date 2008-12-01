@@ -22,7 +22,7 @@ START WEBSKIN
 <cfparam name="stQueryStatus" default="#structNew()#" type="struct" />
 
 <!--- inbound parameters defaults --->
-<ft:processForm action="Search">
+<ft:processForm action="Search" url="refresh">
 	<ft:processFormObjects objectid="#stobj.objectid#" typename="#stobj.typename#" bSessionOnly="true" />
 </ft:processForm>
 
