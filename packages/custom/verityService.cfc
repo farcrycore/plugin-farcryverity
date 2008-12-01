@@ -446,7 +446,7 @@ Collection Maintenance
 		<cfcatch>
 			<cfset stResult.bsuccess="false" />
 			<cfset stResult.message=cfcatch.Message />
-			<cfabort showerror="debugging" />
+			<cfabort showerror="#cfcatch.Message#" />
 		</cfcatch>
 	</cftry>
 	
