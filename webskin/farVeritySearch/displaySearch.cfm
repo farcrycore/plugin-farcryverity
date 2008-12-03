@@ -21,7 +21,22 @@ START WEBSKIN
 <!--- default local vars --->
 <cfparam name="stQueryStatus" default="#structNew()#" type="struct" />
 
+<!--- Save hard coded criteria values --->
+<cfif structKeyExists(url, "criteria") and len(url.criteria)>
+	<cfset form.criteria = url.criteria />
+</cfif>
+<cfif structKeyExists(form, "criteria") and len(form.criteria)>
+	<cfset stProperties = structNew() />
+	<cfset stProperties.objectid = stObj.objectid />
+	<cfset stProperties.criteria = form.criteria />
+	<cfset stResult = setData(stProperties="#stProperties#") />
+	<cflocation url="#application.fc.utils.fixURL(url='#cgi.script_name#?#cgi.query_string#',removeValues='criteria')#" addtoken="false" />
+</cfif>
+
+
 <!--- inbound parameters defaults --->
+
+
 <ft:processForm action="Search" url="refresh">
 	<ft:processFormObjects objectid="#stobj.objectid#" typename="#stobj.typename#" bSessionOnly="true" />
 </ft:processForm>
