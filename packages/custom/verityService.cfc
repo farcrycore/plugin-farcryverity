@@ -523,9 +523,15 @@ Collection Maintenance
 		<!--- SETUP THE ACTUAL SEARCH CRITERIA --->
 		<cfset stResult.searchCriteria = formatCriteria(criteria=stSearchForm.criteria,searchOperator=stSearchForm.operator) />
 		
+		<cfif isValid("boolean",stSearchForm.bSearchPerformed) AND stSearchForm.bSearchPerformed>
+			<cfset stResult.bSearchPerformed = true />
+		<cfelse>
+			<cfset stResult.bSearchPerformed = false />
+		</cfif>
+
 		<!--- SETUP THE RESULTS --->
-		<cfif len(stResult.searchCriteria) AND listLen(stResult.lCollectionsToSearch)>
-		
+		<cfif stResult.bSearchPerformed AND listLen(stResult.lCollectionsToSearch)>
+			
 			<cfsearch collection="#stResult.lCollectionsToSearch#" criteria="#stResult.searchCriteria#" name="stResult.qResults" maxrows="#arguments.maxrows#" suggestions="#arguments.suggestions#" status="stResult.stQueryStatus" type="internet" />
 		
 			<verity:searchLog status="#stResult.stQueryStatus#" type="internet" lcollections="#lCollectionsToSearch#" criteria="#stResult.searchCriteria#" />
