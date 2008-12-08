@@ -4,7 +4,7 @@
 <cfimport taglib="/farcry/core/tags/formtools" prefix="ft" />
 
 <ft:form>
-	<ft:object objectid="#stobj.objectid#" typename="farVeritySearch" lExcludeFields="bSearchPerformed" IncludeFieldSet="false"  />
+	<ft:object objectid="#stobj.objectid#" typename="farVeritySearch" lExcludeFields="label,bSearchPerformed" IncludeFieldSet="false"  />
 	<ft:farcryButtonPanel>
 		<ft:button value="Search" />
 	</ft:farcryButtonPanel>
