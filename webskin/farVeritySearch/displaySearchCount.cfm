@@ -20,6 +20,6 @@ FARCRY IMPORT FILES
 START WEBSKIN
  ------------------>
 	
-<cfoutput><p>Your search for "#stParam.searchCriteria#" produced <span id="vp-resultsfound">#stParam.qResults.recordCount#</span> results.</p></cfoutput>
+<cfoutput><p>Your search <cfif len(stParam.searchCriteria)>for "#stParam.searchCriteria#" </cfif>produced <span id="vp-resultsfound">#stParam.qResults.recordCount#</span> results.</p></cfoutput>
 
 <cfsetting enablecfoutputonly="false">

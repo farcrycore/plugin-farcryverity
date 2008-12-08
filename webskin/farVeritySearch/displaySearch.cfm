@@ -38,7 +38,9 @@ START WEBSKIN
 
 
 <ft:processForm action="Search" url="refresh">
-	<ft:processFormObjects objectid="#stobj.objectid#" typename="#stobj.typename#" bSessionOnly="true" />
+	<ft:processFormObjects objectid="#stobj.objectid#" typename="#stobj.typename#" bSessionOnly="true">
+	 <cfset stproperties.bSearchPerformed = 1 />
+	</ft:processFormObjects>
 </ft:processForm>
 
 <!--- Render the search form and results --->
@@ -50,12 +52,14 @@ START WEBSKIN
 
 	<skin:view typename="#stobj.typename#" objectid="#stobj.objectid#" webskin="displaySearchForm" />
 
-	<cfif len(stSearchResult.searchCriteria)>
+	<cfif stSearchResult.bSearchPerformed>
 
 		<skin:view typename="#stobj.typename#" objectid="#stobj.objectid#" webskin="displaySearchCount" stParam="#stSearchResult#" />
-
-		<skin:view typename="#stobj.typename#" objectid="#stobj.objectid#" webskin="displaySearchSuggestions" stParam="#stSearchResult#" />
-
+		
+		<cfif len(stSearchResult.searchCriteria)>
+			<skin:view typename="#stobj.typename#" objectid="#stobj.objectid#" webskin="displaySearchSuggestions" stParam="#stSearchResult#" />
+		</cfif>
+		
 		<cfif stSearchResult.qResults.recordCount GT 0>
 			<skin:view typename="#stobj.typename#" objectid="#stobj.objectid#" webskin="displaySearchResults" stParam="#stSearchResult#" />
 		</cfif>
@@ -63,7 +67,6 @@ START WEBSKIN
 		<skin:view typename="#stobj.typename#" objectid="#stobj.objectid#" webskin="displaySearchNoCriteria" stParam="#stSearchResult#" />
 	</cfif>
 </ft:form>
-
 
 
 <cfsetting enablecfoutputonly="false">
