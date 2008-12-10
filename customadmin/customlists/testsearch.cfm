@@ -8,7 +8,7 @@
 <admin:header title="Test Search" />
 
 <cfoutput><h1>Search</h1></cfoutput>
-<skin:view typename="farVeritySearch" key="searchForm" webskin="displaySearchResults"  />
+<skin:view typename="farVeritySearch" key="searchForm" webskin="displaySearch"  />
 
 <!--- setup footer --->
 <admin:footer />
