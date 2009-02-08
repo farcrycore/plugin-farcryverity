@@ -36,7 +36,6 @@ START WEBSKIN
 		<cfset stProperties.lCollections = form.lCollections />
 	</cfif>
 	<cfset stResult = setData(stProperties="#stProperties#") />
-	<cflocation url="#application.fc.utils.fixURL(url='#cgi.script_name#?#cgi.query_string#',removeValues='criteria')#" addtoken="false" />
 </cfif>
 
 
