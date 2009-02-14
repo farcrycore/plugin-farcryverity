@@ -32,6 +32,9 @@ START WEBSKIN
 	<cfset stProperties = structNew() />
 	<cfset stProperties.objectid = stObj.objectid />
 	<cfset stProperties.criteria = form.criteria />
+	<cfif structKeyExists(form, "operator")>
+		<cfset stProperties.operator = form.operator />
+	</cfif>
 	<cfif structKeyExists(form, "lCollections")>
 		<cfset stProperties.lCollections = form.lCollections />
 	</cfif>
