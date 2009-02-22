@@ -32,6 +32,7 @@ START WEBSKIN
 	<cfset stProperties = structNew() />
 	<cfset stProperties.objectid = stObj.objectid />
 	<cfset stProperties.criteria = form.criteria />
+	<cfset stproperties.bSearchPerformed = 1 />
 	<cfif structKeyExists(form, "operator")>
 		<cfset stProperties.operator = form.operator />
 	</cfif>
@@ -45,7 +46,7 @@ START WEBSKIN
 <!--- inbound parameters defaults --->
 
 
-<ft:processForm action="Search">
+<ft:processForm action="Search" url="refresh">
 	<ft:processFormObjects objectid="#stobj.objectid#" typename="#stobj.typename#" bSessionOnly="true">
 	 <cfset stproperties.bSearchPerformed = 1 />
 	</ft:processFormObjects>
