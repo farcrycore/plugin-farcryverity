@@ -28,7 +28,7 @@ START WEBSKIN
 	recordsPerPage="25" 
 	Top="true" 
 	Bottom="true"
-	submissionType="url"
+	submissionType="form"
 	renderType="inline"
 	bShowPageDropdown="false"
 	>
