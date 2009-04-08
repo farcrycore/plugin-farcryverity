@@ -90,7 +90,11 @@ afterSave(); synch with other host collections
 		<cfset o = createObject("component", application.stcoapi["#stobj.collectiontypename#"].packagePath) />
 		<!--- ADD DEFAULT FIRST GETTING THE DISPLAY NAME --->
 		<cfif structKeyExists(o, "contentToIndex")>
-			<cfset result = listAppend(result, "contentToIndex:#o['contentToIndex'].metadata.displayName#") />
+			<cfif structKeyExists(o['contentToIndex'].metadata, "displayName")>
+				<cfset result = listAppend(result, "contentToIndex:#o['contentToIndex'].metadata.displayName#") />
+			<cfelse>
+				<cfset result = listAppend(result, "#application.stCoapi[stobj.collectiontypename].displayName#") />
+			</cfif>
 		</cfif>
 		<!--- ADD OTHER OPTIONS --->
 		<cfloop collection="#o#" item="f">
