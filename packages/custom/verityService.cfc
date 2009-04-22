@@ -116,12 +116,12 @@ $Developer: Geoff Bowers (modius@daemon.com.au) $
 	<!--- ALLOW THE DEVELOPER TO CREATE A CUSTOM QUERY FOR THE CONTENT THEY WANT TO INDEX --->
 	<cfset oType = createObject("component", application.stcoapi["#arguments.config.collectiontypename#"].packagePath) />
 	<cfif structKeyExists(oType,"#arguments.config.contentToIndexFunction#")>
-		<cfinvoke component="#oType#" method="#arguments.config.contentToIndexFunction#" returnvariable="qUpdates">
+		<cfinvoke component="#oType#" method="#arguments.config.contentToIndexFunction#" returnvariable="qContentToIndex">
 			<cfinvokeargument name="config" value="#arguments.config#">
 		</cfinvoke>
 	<cfelse>
 		<!--- OTHERWISE GET ALL CONTENT --->
-		<cfquery name="qUpdates" datasource="#application.dsn#">
+		<cfquery name="qContentToIndex" datasource="#application.dsn#">
 		SELECT objectID
 		FROM #arguments.config.collectiontypename#
 		</cfquery>
@@ -155,8 +155,8 @@ $Developer: Geoff Bowers (modius@daemon.com.au) $
 	<!--- JOIN CUSTOM QUERY AND THE COLUMNS DEFINED BY THE CONFIG --->
 	<cfquery name="qUpdates" dbType="query" maxrows="#variables.chunksize#">
 	SELECT qAllContent.*
-	FROM qUpdates, qAllContent
-	WHERE qUpdates.objectid = qAllContent.objectid
+	FROM qContentToIndex, qAllContent
+	WHERE qContentToIndex.objectid = qAllContent.objectid
 	ORDER BY qAllContent.datetimelastupdated
 	</cfquery>
 
@@ -178,8 +178,11 @@ $Developer: Geoff Bowers (modius@daemon.com.au) $
 		
 	</cfif>
 	
+	
+	
+	
 	<!--- determine content items recently sent to draft --->
-	<cfif structkeyexists(application.stcoapi[arguments.config.collectiontypename].stprops, "status")>
+	<!--- <cfif structkeyexists(application.stcoapi[arguments.config.collectiontypename].stprops, "status")>
 		<cfquery name="qSentToDraft" datasource="#application.dsn#">
 		SELECT objectid
 		FROM #arguments.config.collectiontypename#
@@ -188,17 +191,17 @@ $Developer: Geoff Bowers (modius@daemon.com.au) $
 			AND status IN ('draft', 'pending')
 		ORDER BY datetimelastupdated
 		</cfquery>
-	</cfif>	
+	</cfif>	 --->
 	
 	<!--- determine recently deleted content --->
-	<cfquery name="qDeleted" datasource="#application.dsn#">
+	<!--- <cfquery name="qDeleted" datasource="#application.dsn#">
 	SELECT object as objectID
 	FROM farLog
 	WHERE 
 		datetimecreated > #createodbcdatetime(arguments.config.builttodate)#
 		AND type = 'delete'
 	ORDER BY datetimecreated
-	</cfquery>
+	</cfquery> --->
 
 	
 	<!--- if no results, return immediately --->
@@ -212,6 +215,11 @@ $Developer: Geoff Bowers (modius@daemon.com.au) $
 		<cfset stresult.qUpdates = qDeleted />
 		<cfreturn stresult />
 	</cfif>
+	
+	
+	<!--- Return ALL objects currently in the collection. To be used by the deleting process. --->
+	<cfsearch collection="#arguments.config.collectionname#" name="qAllCurrentlyIndexed" />
+	
 
 	<cfswitch expression="#arguments.config.collectionType#">
 
@@ -246,6 +254,19 @@ $Developer: Geoff Bowers (modius@daemon.com.au) $
 					</cfif>
 				</cfloop>
 				
+				
+				<!--- Determine which objects are in the collection which should no longer be. --->
+				<cfquery name="qToDelete" dbtype="query">
+				select qAllCurrentlyIndexed.[key]
+				from qAllCurrentlyIndexed
+				where qAllCurrentlyIndexed.custom2 NOT IN (<cfqueryparam cfsqltype="cf_sql_varchar" list="true" value="#valueList(qContentToIndex.objectid)#">)
+				</cfquery>
+				
+				<cfif qToDelete.recordCount>
+					<cfindex action="delete" type="custom" query="qToDelete" collection ="#arguments.config.collectionname#" key="key" />
+					<cfset stResult.message = "#stResult.message#; #qToDelete.recordCount# record(s) deleted." />
+				</cfif>
+				
 				<cfcatch>
 					<cfset stResult.bsuccess="false" />
 					<cfset stResult.message=cfcatch.Message />
@@ -274,6 +295,18 @@ $Developer: Geoff Bowers (modius@daemon.com.au) $
 				type="custom"
 				category="custom"   />
 			
+		
+			<!--- Determine which objects are in the collection which should no longer be. --->
+			<cfquery name="qToDelete" dbtype="query">
+			select qAllCurrentlyIndexed.[key]
+			from qAllCurrentlyIndexed
+			where qAllCurrentlyIndexed.[key] NOT IN (<cfqueryparam cfsqltype="cf_sql_varchar" list="true" value="#valueList(qContentToIndex.objectid)#">)
+			</cfquery>
+				
+			<cfif qToDelete.recordCount>
+				<cfindex action="delete" type="custom" query="qToDelete" collection ="#arguments.config.collectionname#" key="key" />
+				<cfset stResult.message = "#stResult.message#; #qToDelete.recordCount# record(s) deleted." />
+			</cfif>
 			<cfcatch>
 				<cfset stResult.bsuccess="false" />
 				<cfset stResult.message=cfcatch.Message />
@@ -285,7 +318,7 @@ $Developer: Geoff Bowers (modius@daemon.com.au) $
 	
 
 	<!--- remove content sent to draft --->	
-	<cfif qSentToDraft.recordCount>
+	<!--- <cfif qSentToDraft.recordCount>
 		<cftry>
 			<cfset stResult.bsuccess="true" />
 			<cfset stResult.message=stResult.message & " " & arguments.config.collectionname & ";  " & qSentToDraft.recordcount & " record(s) removed." />
@@ -316,9 +349,9 @@ $Developer: Geoff Bowers (modius@daemon.com.au) $
 			</cfcatch>
 		</cftry>
 	</cfif>
-	
+	 --->
 	<!--- remove content deleted --->
-	<cfif qDeleted.recordCount>
+<!--- 	<cfif qDeleted.recordCount>
 		<cftry>
 			<cfset stResult.bsuccess="true" />
 			<cfset stResult.message=stResult.message & " " & arguments.config.collectionname & ";  " & qDeleted.recordcount & " record(s) deleted." />
@@ -350,7 +383,7 @@ $Developer: Geoff Bowers (modius@daemon.com.au) $
 				<cfset stResult.message=stResult.message & " " & cfcatch.Message />
 			</cfcatch>
 		</cftry>
-	</cfif>
+	</cfif> --->
 	<!--- update builttodate if successful --->
 	<cfif stResult.bSuccess AND structkeyexists(arguments.config, "objectid") and qUpdates.recordcount>
 		<cfset oVerityCollection=createobject("component", "farcry.plugins.farcryverity.packages.types.farVerityCollection") />
