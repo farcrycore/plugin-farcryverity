@@ -46,7 +46,7 @@ START WEBSKIN
 <!--- inbound parameters defaults --->
 
 
-<ft:processForm action="Search" url="refresh">
+<ft:processForm action="Search">
 	<ft:processFormObjects objectid="#stobj.objectid#" typename="#stobj.typename#" bSessionOnly="true">
 	 <cfset stproperties.bSearchPerformed = 1 />
 	</ft:processFormObjects>
