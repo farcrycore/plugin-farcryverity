@@ -7,7 +7,7 @@
 <cfif structKeyExists(application.navid, "search")>
 	<cfset actionURL = "#application.url.conjurer#?objectID=#application.navID.search#" />
 <cfelse>
-	<cfset actionURL = "#application.url.conjurer#?type=#stobj.name#&bodyView=displayTypeBody" />
+	<cfset actionURL = "#application.url.conjurer#?type=#stobj.typename#&bodyView=displayTypeBody" />
 </cfif>
 
 <ft:form action="#actionURL#">
