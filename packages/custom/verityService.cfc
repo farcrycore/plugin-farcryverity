@@ -61,6 +61,8 @@ $Developer: Geoff Bowers (modius@daemon.com.au) $
 	<cfset var baseFilepath="" />
 	<cfset var oType="" />
 	
+	<cfsetting requesttimeout="10000">
+	
 	<!--- required config values --->
 	<cfif NOT structkeyexists(arguments.config, "lindexproperties") OR NOT len(arguments.config.lindexproperties)>
 		<!--- <cfthrow message="update: lindexproperties not present in config." /> --->
