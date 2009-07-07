@@ -52,8 +52,15 @@ START WEBSKIN
 	</ft:processFormObjects>
 </ft:processForm>
 
-<!--- Render the search form and results --->
-<ft:form name="#stobj.typename#SearchForm" bAjaxSubmission="true" ajaxMaskMsg="Searching..." action="#application.url.webroot#/index.cfm?objectid=#stobj.objectid#&view=displaySearch">
+<cfset actionURL = application.fapi.getLink(
+	objectid=stobj.objectid,
+	view="displaySearch",
+	includeDomain=true
+) />
+
+<!--- Render the search form and results #application.url.webroot#/index.cfm?objectid=#stobj.objectid#&view=displaySearch --->
+<ft:form name="#stobj.typename#SearchForm" bAjaxSubmission="true" ajaxMaskMsg="Searching..." 
+	action="#actionURL#">
 
 	<!--- Get the search Results --->
 	<cfset oSearchService=createobject("component", "farcry.plugins.farcryverity.packages.custom.verityService").init() />
