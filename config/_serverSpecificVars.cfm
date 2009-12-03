@@ -28,7 +28,7 @@
 	<!--- set verity collection storage path --->
 	<cfif NOT structkeyExists(application.stplugins.farcryverity, "storagePath")>
 		<!--- set default storage path --->
-		<cfset application.stplugins.farcryverity.oVerityConfig.setStoragePath(storagePath="C:\coldfusionverity\collections") />
+		<cfset application.stplugins.farcryverity.oVerityConfig.setStoragePath(storagePath="/opt/coldfusion8/verity/collections") />
 	<cfelse>
 		<!--- set custom storage path --->
 		<cfset application.stplugins.farcryverity.oVerityConfig.setStoragePath(storagePath=application.stplugins.farcryverity.storagePath) />
