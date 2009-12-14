@@ -20,7 +20,20 @@ FARCRY IMPORT FILES
 START WEBSKIN
  ------------------>
 
+ <skin:pagination paginationID="#stobj.objectid#"
+				  qRecordSet="#stParam.qResults#"
+				  pageLinks="5"
+				  recordsPerPage="25" 
+				  Top="true" 
+				  Bottom="true"
+				  renderType="inline" 
+				  r_stObject="st">
+	<skin:view objectid="#st.objectid#" 
+			   webskin="displayTeaserStandard" />
+</skin:pagination>
+
 <!--- display search results --->
+<!---
 <ft:pagination 
 	paginationID="#stobj.objectid#"
 	qRecordSet="#stParam.qResults#"
@@ -32,10 +45,9 @@ START WEBSKIN
 	renderType="inline"
 	bShowPageDropdown="false"
 	>
-
 	
 	<!--- Loop through the page to get all the results --->
-	<ft:paginateLoop r_stObject="st" bTypeAdmin="false">		
+	<ft:paginateLoop r_stObject="st" bTypeAdmin="false">
 
 		<skin:view 
 			typename="#st.custom1#" 
@@ -48,8 +60,8 @@ START WEBSKIN
 			key="#st.key#"
 			summary="#st.summary#"		
 			 >
-
 	</ft:paginateLoop>
 </ft:pagination>
-			
+--->
+
 <cfsetting enablecfoutputonly="false">
