@@ -20,7 +20,7 @@ FARCRY IMPORT FILES
 START WEBSKIN
  ------------------>
 
- <skin:pagination paginationID="#stobj.objectid#"
+<skin:pagination paginationID="#stobj.objectid#"
 				  qRecordSet="#stParam.qResults#"
 				  pageLinks="5"
 				  recordsPerPage="25" 
@@ -29,39 +29,13 @@ START WEBSKIN
 				  renderType="inline" 
 				  r_stObject="st">
 	<skin:view objectid="#st.objectid#" 
-			   webskin="displayTeaserStandard" />
+			   webskin="displayTeaserStandard"
+			   searchCriteria="#stParam.searchCriteria#"
+			   rank="#st.rank#"
+			   score="#st.score#"
+			   title="#st.title#"
+			   key="#st.key#"
+			   summary="#st.summary#" />
 </skin:pagination>
-
-<!--- display search results --->
-<!---
-<ft:pagination 
-	paginationID="#stobj.objectid#"
-	qRecordSet="#stParam.qResults#"
-	pageLinks="5"
-	recordsPerPage="25" 
-	Top="true" 
-	Bottom="true"
-	submissionType="form"
-	renderType="inline"
-	bShowPageDropdown="false"
-	>
-	
-	<!--- Loop through the page to get all the results --->
-	<ft:paginateLoop r_stObject="st" bTypeAdmin="false">
-
-		<skin:view 
-			typename="#st.custom1#" 
-			objectid="#st.objectid#" 
-			webskin="displaySearchResult"
-			searchCriteria="#stParam.searchCriteria#"
-			rank="#st.rank#"	
-			score="#st.score#"		
-			title="#st.title#"	
-			key="#st.key#"
-			summary="#st.summary#"		
-			 >
-	</ft:paginateLoop>
-</ft:pagination>
---->
 
 <cfsetting enablecfoutputonly="false">
