@@ -126,6 +126,9 @@ $Developer: Geoff Bowers (modius@daemon.com.au) $
 		<cfquery name="qContentToIndex" datasource="#application.dsn#">
 		SELECT objectID
 		FROM #arguments.config.collectiontypename#
+		<cfif structkeyexists(application.stcoapi[arguments.config.collectiontypename].stprops, "status")>
+		where status = 'approved'
+		</cfif>
 		</cfquery>
 	</cfif>
 
@@ -183,27 +186,7 @@ $Developer: Geoff Bowers (modius@daemon.com.au) $
 	
 	
 	
-	<!--- determine content items recently sent to draft --->
-	<!--- <cfif structkeyexists(application.stcoapi[arguments.config.collectiontypename].stprops, "status")>
-		<cfquery name="qSentToDraft" datasource="#application.dsn#">
-		SELECT objectid
-		FROM #arguments.config.collectiontypename#
-		WHERE 
-			datetimelastupdated > #createodbcdatetime(arguments.config.builttodate)#
-			AND status IN ('draft', 'pending')
-		ORDER BY datetimelastupdated
-		</cfquery>
-	</cfif>	 --->
-	
-	<!--- determine recently deleted content --->
-	<!--- <cfquery name="qDeleted" datasource="#application.dsn#">
-	SELECT object as objectID
-	FROM farLog
-	WHERE 
-		datetimecreated > #createodbcdatetime(arguments.config.builttodate)#
-		AND type = 'delete'
-	ORDER BY datetimecreated
-	</cfquery> --->
+
 
 	
 	<!--- if no results, return immediately --->
@@ -319,73 +302,7 @@ $Developer: Geoff Bowers (modius@daemon.com.au) $
 
 	
 
-	<!--- remove content sent to draft --->	
-	<!--- <cfif qSentToDraft.recordCount>
-		<cftry>
-			<cfset stResult.bsuccess="true" />
-			<cfset stResult.message=stResult.message & " " & arguments.config.collectionname & ";  " & qSentToDraft.recordcount & " record(s) removed." />
-			
-			<cfswitch expression="#arguments.config.collectionType#">
-		
-				<cfcase value="file">
 	
-					<cfsearch collection="#arguments.config.collectionname#" criteria="" name="qFileIndexes">
-					<cfquery dbtype="query" name="qSentToDraft">
-					SELECT [key]
-					FROM qFileIndexes
-					WHERE custom2 IN (<cfqueryparam cfsqltype="cf_sql_varchar" list="true" value="#valueList(qSentToDraft.objectid)#">)
-					</cfquery>			
-					
-					<cfindex action="delete" type="custom" query="qSentToDraft" collection ="#arguments.config.collectionname#" key="key" />
-				</cfcase>	
-				
-				<cfdefaultcase>
-					<cfindex action="delete" type="custom" query="qSentToDraft" collection ="#arguments.config.collectionname#" key="objectid" />
-				</cfdefaultcase>
-			</cfswitch>	
-			
-			
-			<cfcatch>
-				<cfset stResult.bsuccess="false" />
-				<cfset stResult.message=stResult.message & " " & cfcatch.Message />
-			</cfcatch>
-		</cftry>
-	</cfif>
-	 --->
-	<!--- remove content deleted --->
-<!--- 	<cfif qDeleted.recordCount>
-		<cftry>
-			<cfset stResult.bsuccess="true" />
-			<cfset stResult.message=stResult.message & " " & arguments.config.collectionname & ";  " & qDeleted.recordcount & " record(s) deleted." />
-			
-			
-				<cfswitch expression="#arguments.config.collectionType#">
-		
-				<cfcase value="file">
-	
-					<cfsearch collection="#arguments.config.collectionname#" criteria="" name="qFileIndexes">
-					<cfquery dbtype="query" name="qDeleted">
-					SELECT [key]
-					FROM qFileIndexes
-					WHERE custom2 IN (<cfqueryparam cfsqltype="cf_sql_varchar" list="true" value="#valueList(qSentToDraft.objectid)#">)
-					</cfquery>			
-					
-					<cfindex action="delete" type="custom" query="qDeleted" collection ="#arguments.config.collectionname#" key="key" />
-				</cfcase>	
-				
-				<cfdefaultcase>
-					<cfindex action="delete" type="custom" query="qDeleted" collection ="#arguments.config.collectionname#" key="objectid" />
-				</cfdefaultcase>
-			</cfswitch>	
-				
-			
-			
-			<cfcatch>
-				<cfset stResult.bsuccess="false" />
-				<cfset stResult.message=stResult.message & " " & cfcatch.Message />
-			</cfcatch>
-		</cftry>
-	</cfif> --->
 	<!--- update builttodate if successful --->
 	<cfif stResult.bSuccess AND structkeyexists(arguments.config, "objectid") and qUpdates.recordcount>
 		<cfset oVerityCollection=createobject("component", "farcry.plugins.farcryverity.packages.types.farVerityCollection") />
