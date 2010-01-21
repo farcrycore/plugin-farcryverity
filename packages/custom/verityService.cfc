@@ -537,7 +537,71 @@ Collection Maintenance
 		<cfreturn stResult />
 	</cffunction>
 	
+<cffunction name="search" access="public" output="false" returntype="struct" hint="Returns a structure containing extensive information of the search results">
+		<cfargument name="criteria" required="true" default="" hint="The verity search criteria">
+		<cfargument name="lcollections" required="false" default="all" hint="The list of collections to be searched" />
+		<cfargument name="previousCriteria" required="false" default="" hint="Optional Previous criteria">
+		<cfargument name="maxrows" required="false" default="1000" hint="The maximum results we want returned from the verity search">
+		<cfargument name="suggestions" required="false" default="10" hint="The maximum alternate search string suggestions we want returned from the verity search.">
+		<cfargument name="operator" required="false" default="" hint="The verity search operator">
+		<cfargument name="orderby" required="false" default="rank" hint="The order by field">
+		
+		<cfset var stResult = structNew() />
+		<cfset var qResults = queryNew("init") />
+		<cfset var lAllCollections = application.stPlugins.farcryVerity.oVerityConfig.getCollectionList() />
+		
+		<cfimport taglib="/farcry/plugins/farcryverity/tags" prefix="verity" />
+
+
+		<!--- setup the collections to search on, this may depend on the form value passed in on the search results page --->
+		<cfif not len(arguments.lCollections) OR arguments.lCollections EQ "all">
+			<cfset stResult.lCollectionsToSearch = lAllCollections />
+		<cfelse>
+			<cfset stResult.lCollectionsToSearch = arguments.lCollections />
+		</cfif>
 	
+		<!--- SETUP THE ACTUAL SEARCH CRITERIA --->
+		<cfset stResult.searchCriteria = formatCriteria(criteria=arguments.criteria,searchOperator=arguments.operator) />
+			
+		<cfsearch collection="#stResult.lCollectionsToSearch#" criteria="#stResult.searchCriteria#" name="stResult.qResults" maxrows="#arguments.maxrows#" suggestions="#arguments.suggestions#" status="stResult.stQueryStatus" type="internet" />
+		
+		<verity:searchLog status="#stResult.stQueryStatus#" type="internet" lcollections="#stResult.lCollectionsToSearch#" criteria="#stResult.searchCriteria#" />
+			
+			<cfquery dbtype="query" name="stResult.qResults">
+			SELECT *, custom2 AS objectid
+			FROM stResult.qResults
+			WHERE category = 'file'
+			
+			UNION
+			
+			SELECT *, [key] AS objectid
+			FROM stResult.qResults
+			WHERE category <> 'file'			
+			</cfquery>	
+			
+			<!--- Sort the results --->
+			<cfif arguments.orderby neq "RANK">
+				<cfquery dbtype="query" name="stResult.qResults">
+				SELECT *
+				FROM stResult.qResults
+				ORDER BY #arguments.orderby#
+				</cfquery>
+			<cfelse>
+				<cfquery dbtype="query" name="stResult.qResults">
+				SELECT *
+				FROM stResult.qResults
+				ORDER BY rank
+				</cfquery>
+			</cfif>
+			
+			
+
+
+
+	
+		
+		<cfreturn stResult />
+	</cffunction>	 
 	
 
 	
