@@ -16,12 +16,14 @@ $Developer: Geoff Bowers (modius@daemon.com.au) $
 <cffunction name="init">
 	<cfargument name="path" default="" type="string" hint="Absolute path to Verity collection storage." />
 	<cfargument name="chunksize" default="1000" type="numeric" hint="Size of recordsets to update." />
+	<cfargument name="verityConfig" default="#application.stplugins.farcryverity.oVerityConfig#"  hint="verity config object" />
 	
 	<cfset variables.chunksize = arguments.chunksize />
+	<cfset variables.oVerityConfig=arguments.verityConfig>
 	
 	<!--- server specific collection path set in plugin constant scope --->
 	<cfif NOT len(arguments.path)>
-		<cfset variables.path = application.stplugins.farcryverity.oVerityConfig.getStoragePath() />
+		<cfset variables.path = variables.oVerityConfig.getStoragePath() />
 	<cfelse>
 		<cfset variables.path = arguments.path />
 	</cfif>	
@@ -374,7 +376,7 @@ Gateway
 	<cfquery dbtype="query" name="qReturn">
 	SELECT CATEGORIES, CHARSET, CREATED, DOCCOUNT, LASTMODIFIED, MAPPED, NAME, ONLINE, PATH, REGISTERED, SIZE
 	FROM qReturn
-	WHERE NAME LIKE '#application.ApplicationName#%'
+	WHERE NAME LIKE '#variables.oVerityConfig.getCollectionPrefix()#%'
 	</cfquery>
 	
 	<cfreturn qReturn />
@@ -457,8 +459,8 @@ Collection Maintenance
 		<cfset var qResults = queryNew("init") />
 		<cfset var oSearchForm = createObject("component", application.stcoapi["#arguments.typename#"].packagePath) />
 		<cfset var stSearchForm = oSearchForm.getData(objectid="#arguments.objectid#") />
-		<cfset var lAllCollections = application.stPlugins.farcryVerity.oVerityConfig.getCollectionList() />
-		<cfset var aAllCollections = application.stPlugins.farcryVerity.oVerityConfig.getCollectionArray() />
+		<cfset var lAllCollections = variables.oVerityConfig.getCollectionList() />
+		<cfset var aAllCollections = variables.oVerityConfig.getCollectionArray() />
 		<cfset var lCollectionsToSearch = "" />
 		<cfset var searchCriteria = "" />
 		
@@ -548,7 +550,7 @@ Collection Maintenance
 		
 		<cfset var stResult = structNew() />
 		<cfset var qResults = queryNew("init") />
-		<cfset var lAllCollections = application.stPlugins.farcryVerity.oVerityConfig.getCollectionList() />
+		<cfset var lAllCollections = variables.oVerityConfig.getCollectionList() />
 		
 		<cfimport taglib="/farcry/plugins/farcryverity/tags" prefix="verity" />
 
