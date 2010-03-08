@@ -8,11 +8,16 @@
 	<cfset variables.storagePath="" />
 	<cfset variables.aCollections=arrayNew(1) />
 	<cfset variables.lCollections="" />
+	<cfset variables.collectionPrefix="" />
 	<cfset variables.hostname=createObject("java", "java.net.InetAddress").localhost.getHostName() />
 
 	<cffunction name="init" access="public" output="false" returntype="verityConfig">
+		<cfargument name="collectionPrefix" default="#application.ApplicationName#" required="false">
+		
+		<cfset setCollectionPrefix(arguments.collectionPrefix)>
 		<cfset setCollectionArray() />
 		<cfset setCollectionList() />
+		
 		<cfreturn this />
 	</cffunction>
 
@@ -63,8 +68,19 @@
 		
 		<cfreturn />
 	</cffunction>
+	
+	<cffunction name="setCollectionPrefix" access="private" returntype="void">
+		<cfargument name="collectionPrefix" required="true">
+		
+		<cfset variables.collectionPrefix=arguments.collectionPrefix>
+	</cffunction>
+	
+	<cffunction name="getCollectionPrefix" access="private" returntype="string">
+		<cfreturn variables.collectionPrefix>
+	</cffunction>
 
 	<cffunction name="getCollections" access="private" output="false" returntype="query">
+		
 		<cfset var qCollections=queryNew("configid, title, collectionname")>
 		
 		<cfquery datasource="#application.dsn#" name="qCollections">
@@ -72,7 +88,7 @@
 		FROM farVerityCollection
 		WHERE bEnableSearch = 1
 		AND hostname = <cfqueryparam cfsqltype="cf_sql_varchar" value="#variables.hostname#" />
-		AND collectionname LIKE <cfqueryparam cfsqltype="cf_sql_varchar" value="#application.ApplicationName#/_%" /> escape '/'
+		AND collectionname LIKE <cfqueryparam cfsqltype="cf_sql_varchar" value="#getCollectionPrefix()#/_%" /> escape '/'
 		ORDER BY title
 		</cfquery>
 		
