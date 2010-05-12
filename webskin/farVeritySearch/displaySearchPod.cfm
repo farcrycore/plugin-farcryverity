@@ -5,9 +5,9 @@
 
 <!--- SETUP THE URL OF THE SEARCH PAGE --->
 <cfif structKeyExists(application.navid, "search")>
-	<cfset actionURL = "#application.url.conjurer#?objectID=#application.navID.search#" />
+	<cfset actionURL = application.fapi.getLink(objectID=application.navID.search) />
 <cfelse>
-	<cfset actionURL = "#application.url.conjurer#?type=#stobj.typename#&bodyView=displayTypeBody" />
+	<cfset actionURL = application.fapi.getLink(type=stobj.typename,bodyView="displayTypeBody") />
 </cfif>
 
 <ft:form action="#actionURL#">
