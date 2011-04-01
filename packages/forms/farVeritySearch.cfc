@@ -1,4 +1,4 @@
-<cfcomponent displayname="Search Form" hint="The search form for searching through the verity index" extends="farcry.core.packages.forms.forms" output="false">
+<cfcomponent displayname="Search Form" hint="The search form for searching through the verity index" extends="farcry.core.packages.forms.forms" output="false" fualias="search">
 	<cfproperty ftSeq="1" ftFieldset="General" name="criteria" type="string" default="" hint="The search text criteria" ftLabel="Search" ftClass="verity-search-criteria" />
 	<cfproperty ftSeq="2" ftFieldset="General" name="operator" type="string" default="" hint="The operator used for the search" ftLabel="Search Operator" ftType="list" ftList="any:Any of these words,all:All of these words,phrase:These words as a phrase" />
 	<cfproperty ftSeq="3" ftFieldset="General" name="lCollections" type="string" default="" hint="The collections to be searched" ftLabel="Collections" ftType="list" ftListData="getCollectionList" />
