@@ -488,19 +488,31 @@ Collection Maintenance
 			
 			<cfsearch collection="#stResult.lCollectionsToSearch#" criteria="#stResult.searchCriteria#" name="stResult.qResults" maxrows="#arguments.maxrows#" suggestions="#arguments.suggestions#" status="stResult.stQueryStatus" type="internet" />
 		
+			<!--- de-dupe the results. Technically this should never be needed but we have found verity for some reason is allowing duplicate keys at times! --->
+			<cfquery name="stResult.qResults" dbtype="query">
+			SELECT 	max([key]) as [key], max(title) as title, max(custom1) as custom1, max(custom2) as custom2, max(custom3) as custom3, max(custom4) as custom4, max(rank) as rank, max(score) as score, max(summary) as summary
+					,max(AUTHOR) as author, max(category) as category, max(categorytree) as categorytree, max(context) as context, max(size) as size, max(type) as type, max(url) as url
+			FROM stResult.qResults
+			group by [key]
+			order by rank
+			</cfquery>
+
+		
 			<verity:searchLog status="#stResult.stQueryStatus#" type="internet" lcollections="#lCollectionsToSearch#" criteria="#stResult.searchCriteria#" />
 			
 			<cfquery dbtype="query" name="stResult.qResults">
 			SELECT *, custom2 AS objectid
 			FROM stResult.qResults
-			WHERE category = 'file'
+			WHERE cast(category as varchar) = 'file'
 			
 			UNION
 			
 			SELECT *, [key] AS objectid
 			FROM stResult.qResults
-			WHERE category <> 'file'			
+			WHERE cast(category as varchar) <> 'file'			
 			</cfquery>	
+			
+			
 			
 			<!--- Sort the results --->
 			<cfif stSearchForm.orderby neq "RANK">
