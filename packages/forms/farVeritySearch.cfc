@@ -20,7 +20,8 @@
 	</cffunction>
 	
 	<cffunction name="filterResults" access="public" output="false" returntype="query" hint="Allows the developer to add a 2nd filter on the results of the verity search">
-		<cfargument name="objectid" required="true" hint="The objectid of this verity search form object" />		
+		<cfargument name="objectid" required="false" default="" hint="The objectid of this verity search form object" />	
+		<cfargument name="stObject" type="struct" required="false" default="#structNew()#" hint="The verity search object" />		
 		<cfargument name="qResults" required="true" hint="The initial results of the search" />
 		
 		<cfreturn arguments.qResults />
