@@ -244,7 +244,12 @@ $Developer: Geoff Bowers (modius@daemon.com.au) $
 				
 				<!--- Determine which objects are in the collection which should no longer be. --->
 				<cfquery name="qToDelete" dbtype="query">
-				select qAllCurrentlyIndexed.[key]
+				<cfif application.dbType EQ "mssql">
+					select qAllCurrentlyIndexed.[key]
+				</cfif>
+				<cfif application.dbType EQ "mysql">
+					select qAllCurrentlyIndexed.key
+				</cfif>
 				from qAllCurrentlyIndexed
 				where qAllCurrentlyIndexed.custom2 NOT IN (<cfqueryparam cfsqltype="cf_sql_varchar" list="true" value="#valueList(qContentToIndex.objectid)#">)
 				</cfquery>
@@ -285,9 +290,16 @@ $Developer: Geoff Bowers (modius@daemon.com.au) $
 		
 			<!--- Determine which objects are in the collection which should no longer be. --->
 			<cfquery name="qToDelete" dbtype="query">
-			select qAllCurrentlyIndexed.[key]
-			from qAllCurrentlyIndexed
-			where qAllCurrentlyIndexed.[key] NOT IN (<cfqueryparam cfsqltype="cf_sql_varchar" list="true" value="#valueList(qContentToIndex.objectid)#">)
+			<cfif application.dbType EQ "mssql">
+				select qAllCurrentlyIndexed.[key]
+				from qAllCurrentlyIndexed
+				where qAllCurrentlyIndexed.[key] NOT IN (<cfqueryparam cfsqltype="cf_sql_varchar" list="true" value="#valueList(qContentToIndex.objectid)#">)
+			</cfif>
+			<cfif application.dbType EQ "mysql">
+				select qAllCurrentlyIndexed.key
+				from qAllCurrentlyIndexed
+				where qAllCurrentlyIndexed.key NOT IN (<cfqueryparam cfsqltype="cf_sql_varchar" list="true" value="#valueList(qContentToIndex.objectid)#">)
+			</cfif>
 			</cfquery>
 				
 			<cfif qToDelete.recordCount>
@@ -490,11 +502,20 @@ Collection Maintenance
 		
 			<!--- de-dupe the results. Technically this should never be needed but we have found verity for some reason is allowing duplicate keys at times! --->
 			<cfquery name="stResult.qResults" dbtype="query">
-			SELECT 	max([key]) as [key], max(title) as title, max(custom1) as custom1, max(custom2) as custom2, max(custom3) as custom3, max(custom4) as custom4, max(rank) as rank, max(score) as score, max(summary) as summary
-					,max(AUTHOR) as author, max(category) as category, max(categorytree) as categorytree, max(context) as context, max(size) as size, max(type) as type, max(url) as url
-			FROM stResult.qResults
-			group by [key]
-			order by rank
+			<cfif application.dbType EQ "mssql">
+				SELECT 	max([key]) as [key], max(title) as title, max(custom1) as custom1, max(custom2) as custom2, max(custom3) as custom3, max(custom4) as custom4, max(rank) as rank, max(score) as score, max(summary) as summary
+						,max(AUTHOR) as author, max(category) as category, max(categorytree) as categorytree, max(context) as context, max(size) as size, max(type) as type, max(url) as url
+				FROM stResult.qResults
+				group by [key]
+				order by rank
+			</cfif>
+			<cfif application.dbType EQ "mysql">
+				SELECT 	max(key) as key, max(title) as title, max(custom1) as custom1, max(custom2) as custom2, max(custom3) as custom3, max(custom4) as custom4, max(rank) as rank, max(score) as score, max(summary) as summary
+						,max(AUTHOR) as author, max(category) as category, max(categorytree) as categorytree, max(context) as context, max(size) as size, max(type) as type, max(url) as url
+				FROM stResult.qResults
+				group by key
+				order by rank
+			</cfif>
 			</cfquery>
 
 		
@@ -507,7 +528,12 @@ Collection Maintenance
 			
 			UNION
 			
-			SELECT *, [key] AS objectid
+			<cfif application.dbType EQ "mssql">
+				SELECT *, [key] AS objectid
+			</cfif>
+			<cfif application.dbType EQ "mysql">
+				SELECT *, key AS objectid
+			</cfif>
 			FROM stResult.qResults
 			WHERE cast(category as varchar) <> 'file'			
 			</cfquery>	
@@ -588,7 +614,12 @@ Collection Maintenance
 			
 			UNION
 			
-			SELECT *, [key] AS objectid
+			<cfif application.dbType EQ "mssql">
+				SELECT *, [key] AS objectid
+			</cfif>
+			<cfif application.dbType EQ "mysql">
+				SELECT *, key AS objectid
+			</cfif>
 			FROM stResult.qResults
 			WHERE category <> 'file'			
 			</cfquery>	
