@@ -244,7 +244,7 @@ $Developer: Geoff Bowers (modius@daemon.com.au) $
 				
 				<!--- Determine which objects are in the collection which should no longer be. --->
 				<cfquery name="qToDelete" dbtype="query">
-				<cfif application.dbType EQ "mssql">
+				<cfif application.dbType NEQ "mysql">
 					select qAllCurrentlyIndexed.[key]
 				</cfif>
 				<cfif application.dbType EQ "mysql">
@@ -290,7 +290,7 @@ $Developer: Geoff Bowers (modius@daemon.com.au) $
 		
 			<!--- Determine which objects are in the collection which should no longer be. --->
 			<cfquery name="qToDelete" dbtype="query">
-			<cfif application.dbType EQ "mssql">
+			<cfif application.dbType NEQ "mysql">
 				select qAllCurrentlyIndexed.[key]
 				from qAllCurrentlyIndexed
 				where qAllCurrentlyIndexed.[key] NOT IN (<cfqueryparam cfsqltype="cf_sql_varchar" list="true" value="#valueList(qContentToIndex.objectid)#">)
@@ -502,7 +502,7 @@ Collection Maintenance
 		
 			<!--- de-dupe the results. Technically this should never be needed but we have found verity for some reason is allowing duplicate keys at times! --->
 			<cfquery name="stResult.qResults" dbtype="query">
-			<cfif application.dbType EQ "mssql">
+			<cfif application.dbType NEQ "mysql">
 				SELECT 	max([key]) as [key], max(title) as title, max(custom1) as custom1, max(custom2) as custom2, max(custom3) as custom3, max(custom4) as custom4, max(rank) as rank, max(score) as score, max(summary) as summary
 						,max(AUTHOR) as author, max(category) as category, max(categorytree) as categorytree, max(context) as context, max(size) as size, max(type) as type, max(url) as url
 				FROM stResult.qResults
@@ -528,7 +528,7 @@ Collection Maintenance
 			
 			UNION
 			
-			<cfif application.dbType EQ "mssql">
+			<cfif application.dbType NEQ "mysql">
 				SELECT *, [key] AS objectid
 			</cfif>
 			<cfif application.dbType EQ "mysql">
@@ -614,7 +614,7 @@ Collection Maintenance
 			
 			UNION
 			
-			<cfif application.dbType EQ "mssql">
+			<cfif application.dbType NEQ "mysql">
 				SELECT *, [key] AS objectid
 			</cfif>
 			<cfif application.dbType EQ "mysql">
