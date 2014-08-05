@@ -14,38 +14,41 @@ $Developer: Geoff Bowers (modius@daemon.com.au) $
 <cfcomponent displayname="Verity Maintenance" hint="Maintenance object for physical Verity collections.">
 
 <cffunction name="init">
-	<cfargument name="path" default="" type="string" hint="Absolute path to Verity collection storage." />
-	<cfargument name="chunksize" default="1000" type="numeric" hint="Size of recordsets to update." />
-	<cfargument name="verityConfig" default="#application.stplugins.farcryverity.oVerityConfig#"  hint="verity config object" />
-	
-	<cfset variables.chunksize = arguments.chunksize />
-	<cfset variables.oVerityConfig=arguments.verityConfig>
-	
-	<!--- server specific collection path set in plugin constant scope --->
-	<cfif NOT len(arguments.path)>
-		<cfset variables.path = variables.oVerityConfig.getStoragePath() />
-	<cfelse>
-		<cfset variables.path = arguments.path />
-	</cfif>	
-	
-	<!--- backward compatability; collection storage path --->
-	<cfif NOT len(variables.path)>
-		<cfif structkeyexists(application.path, "verityStoragePath")>
-		<!--- deprecated; server specific collection path set in ./config/_serverSpecificVars.cfm --->
-			<cfset variables.path = application.path.verityStoragePath />
-		
-		<cfelseif isDefined("application.config.general.verityStoragePath")>
-		<!--- deprecated; collection set in general config --->
-			<cfset variables.path = application.config.general.verityStoragePath />
-		</cfif>
-	</cfif>
+        <cfargument name="path" default="" type="string" hint="Absolute path to Verity collection storage." />
+        <cfargument name="chunksize" default="1000" type="numeric" hint="Size of recordsets to update." />
+        <cfargument name="verityConfig" hint="verity config object" />
 
-	<cfif NOT len(variables.path)>
-	<!--- can't determine a proper path --->
-		<cfthrow type="Application" errorcode="plugins.farcryverity.verityService" message="Collection path not defined." detail="A collection path for verity collections must be defined to use the Verity plugin." />
-	</cfif>
-	
-	<cfreturn this />
+        <cfset variables.chunksize = arguments.chunksize />
+
+        <cfif not structkeyexists(arguments,"verityConfig") and isdefined("application.stplugins.farcryverity.oVerityConfig")>
+              <cfset variables.oVerityConfig=application.stplugins.farcryverity.oVerityConfig>
+        </cfif>
+
+        <!--- server specific collection path set in plugin constant scope --->
+        <cfif NOT len(arguments.path) and structkeyexists(variables,"oVerityConfig")>
+                <cfset variables.path = variables.oVerityConfig.getStoragePath() />
+        <cfelseif len(arguments.path)>
+                <cfset variables.path = arguments.path />
+        </cfif>
+
+        <!--- backward compatability; collection storage path --->                                                                                                                                                                             
+        <cfif not structkeyexists(variables,"path") or NOT len(variables.path)>                                                                                                                                                               
+                <cfif structkeyexists(application.path, "verityStoragePath")>
+                <!--- deprecated; server specific collection path set in ./config/_serverSpecificVars.cfm --->
+                        <cfset variables.path = application.path.verityStoragePath />
+
+                <cfelseif isDefined("application.config.general.verityStoragePath")>
+                <!--- deprecated; collection set in general config --->
+                        <cfset variables.path = application.config.general.verityStoragePath />
+                </cfif>
+        </cfif>
+
+        <cfif not structkeyexists(variables,"path") or NOT len(variables.path)>
+        <!--- can't determine a proper path --->
+                <cfthrow type="Application" errorcode="plugins.farcryverity.verityService" message="Collection path not defined." detail="A collection path for verity collections must be defined to use the Verity plugin." />
+        </cfif>
+
+        <cfreturn this />
 </cffunction>
 
 
